@@ -4,7 +4,14 @@
  */
 package Database;
 
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,13 +42,21 @@ public class Tables {
     """;
 
     public static void createUsersTable(DBManager manager) {
+        try {
+            manager.updateDB("DROP TABLE USERS");
+        } catch (Exception e) {
+           //Table doesn't exist
+        }
         manager.updateDB(CREATE_USERS_TABLE);
-        manager.dropTableifexist(CREATE_USERS_TABLE);
     }
     
     public static void createBookingsTable(DBManager manager) {
+        try {
+            manager.updateDB("DROP TABLE BOOKINGS");
+        } catch (Exception e) {
+            // Table doesn't exist
+        }
         manager.updateDB(CREATE_BOOKINGS_TABLE);
-        manager.dropTableifexist(CREATE_BOOKINGS_TABLE);
     } 
    
     }
