@@ -34,17 +34,15 @@ public class Tables {
         )
     """;
 
-
     public static void createUsersTable(DBManager manager) {
         manager.updateDB(CREATE_USERS_TABLE);
         manager.dropTableifexist(CREATE_USERS_TABLE);
     }
+    
     public static void createBookingsTable(DBManager manager) {
         manager.updateDB(CREATE_BOOKINGS_TABLE);
         manager.dropTableifexist(CREATE_BOOKINGS_TABLE);
-
-
-    }
+    } 
    
     }
 

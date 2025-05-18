@@ -23,7 +23,7 @@ public class DBManager {
 
     public DBManager() {
         establishConnection();
-        createTable(); // ← Optional
+      //  createTable(); 
 
     }
 
@@ -35,9 +35,13 @@ public class DBManager {
     }
     
     public void establishConnection() {
+        if ( conn != null) {
+            return;
+        }
+        
         try {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-            String dburl = "jdbc:derby:TransportDB;create=true;";
+            String dburl = "jdbc:derby:TransportDB;";
             conn = DriverManager.getConnection(dburl);
             statement = conn.createStatement();
             System.out.println("Database Connection Successful");
@@ -49,6 +53,10 @@ public class DBManager {
     }
     
     public void createTable() {
+        if ( conn == null || statement == null) {
+            System.out.print("NO DB CONNECTION, CANNOT CREATE TABLE");
+            return;
+        }
         Tables.createUsersTable(this);
         Tables.createBookingsTable(this);
     }
