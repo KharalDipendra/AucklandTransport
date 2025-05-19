@@ -15,7 +15,9 @@ public class Main {
         new LaunchWindow().setVisible(true);
         DBManager manager = new DBManager();
         manager.getConnection();
-        manager.createTable(); 
+     
+       manager.createTable(); 
+        
     }
 }
    

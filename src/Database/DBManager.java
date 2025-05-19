@@ -87,7 +87,17 @@ public class DBManager {
             Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE,null,ex);
         }
     }
-    
+
+    public void insertDefaultBookingTypes() {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate("INSERT INTO booking_type (type) VALUES ('bus')");
+            stmt.executeUpdate("INSERT INTO booking_type (type) VALUES ('train')");
+        } catch (SQLException e) {
+            System.out.println("Might already exist: " + e.getMessage());
+        }
+    }
+     
+     
     
     public void closeConnection() {
         if (statement != null) {

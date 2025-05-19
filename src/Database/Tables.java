@@ -4,15 +4,6 @@
  */
 package Database;
 
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Pammi
@@ -28,19 +19,38 @@ public class Tables {
             topUp DECIMAL(10,2) DEFAULT 0.00
         )
     """;
-    
-    private static final String CREATE_BOOKINGS_TABLE = """
-        CREATE TABLE BOOKINGS (
-            id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
-            name VARCHAR(100) NOT NULL,
-            cardNumber VARCHAR(20) NOT NULL,
-            type VARCHAR(50) NOT NULL,
-            dateBooked DATE NOT NULL,
-            departure TIMESTAMP NOT NULL,
-            FOREIGN KEY (cardNumber) REFERENCES USERS(cardNumber)
+
+       
+    private static final String CREATE_BOOKING_TYPE = """
+        CREATE TABLE booking_type (
+            id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            type VARCHAR(10) NOT NULL UNIQUE CHECK (type IN ('bus', 'train'))
         )
     """;
 
+    private static final String CREATE_BOOKINGS_TABLE = """
+        CREATE TABLE BOOKINGS (
+            id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+            userid INT NOT NULL,
+            booking_type_id INT NOT NULL,
+            dateBooked DATE NOT NULL,
+            departure VARCHAR(100) NOT NULL,
+    
+            FOREIGN KEY (userid) REFERENCES USERS(id) ON DELETE CASCADE,
+            FOREIGN KEY (booking_type_id) REFERENCES booking_type(id)
+        )
+    """;
+ 
+        
+    
+/*
+    public static void dropTables(DBManager manager) {
+        manager.updateDB("DROP TABLE BOOKINGS"); 
+        manager.updateDB("DROP TABLE USERS");
+
+    } */
+        
+    
     public static void createUsersTable(DBManager manager) {
         try {
             manager.updateDB("DROP TABLE USERS");
@@ -56,7 +66,16 @@ public class Tables {
         } catch (Exception e) {
             // Table doesn't exist
         }
-        manager.updateDB(CREATE_BOOKINGS_TABLE);
+       manager.updateDB(CREATE_BOOKINGS_TABLE);
+    } 
+
+    public static void createBookingTypeTable(DBManager manager) {
+        try {
+            manager.updateDB("DROP TABLE BOOKINGS");
+        } catch (Exception e) {
+            // Table doesn't exist
+        }
+       manager.updateDB(CREATE_BOOKING_TYPE);
     } 
    
     }
