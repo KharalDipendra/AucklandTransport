@@ -20,8 +20,8 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.card_money = (double) 0;
-        this.cardNumber = "NULL";
+        this.card_money = 0.0;
+        this.cardNumber = "";
     }
     public String getName() {
         return this.name;
@@ -64,7 +64,7 @@ public class User {
     }
 
     public boolean hasCard() {
-        return cardNumber != null && !cardNumber.isBlank();
+        return cardNumber != null && !cardNumber.isEmpty() && !cardNumber.equals("NULL");
     }
 
     

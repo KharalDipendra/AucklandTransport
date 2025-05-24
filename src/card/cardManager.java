@@ -1,6 +1,7 @@
 package card;
 
 import Database.DBManager;
+import Database.UsersDB;
 import User.User;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class cardManager {
         Card card = new Card();
         user.setCardNumber(card.getCardNumber());
         // update table
-     //   manager.updateUser(user);
+        UsersDB.updateUser(user, manager);
         return card.getCardNumber();
     }
 }

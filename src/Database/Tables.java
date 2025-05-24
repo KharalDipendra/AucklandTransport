@@ -4,11 +4,15 @@
  */
 package Database;
 
+import java.sql.SQLException;
+
 /**
- *
- * @author Pammi
+ * Tables class contains SQL statements for creating database tables
+ * and methods to manage table creation in the database.
+ * This class defines the schema for users, bookings, and booking types.
  */
 public class Tables {
+    /** SQL statement to create the users table */
     private static final String CREATE_USERS_TABLE = """
         CREATE TABLE USERS (
             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
@@ -20,7 +24,7 @@ public class Tables {
         )
     """;
 
-       
+    /** SQL statement to create the booking type table */
     private static final String CREATE_BOOKING_TYPE = """
         CREATE TABLE booking_type (
             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -28,6 +32,7 @@ public class Tables {
         )
     """;
 
+    /** SQL statement to create the bookings table */
     private static final String CREATE_BOOKINGS_TABLE = """
         CREATE TABLE BOOKINGS (
             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
@@ -41,42 +46,49 @@ public class Tables {
         )
     """;
  
-        
-    
-/*
-    public static void dropTables(DBManager manager) {
-        manager.updateDB("DROP TABLE BOOKINGS"); 
-        manager.updateDB("DROP TABLE USERS");
-
-    } */
-        
-    
-    public static void createUsersTable(DBManager manager) {
+    /**
+     * Creates the users table in the database
+     * Drops the existing table if it exists before creating a new one
+     * @param manager DBManager instance for database operations
+     * @throws SQLException if there is an error creating the table
+     */
+    public static void createUsersTable(DBManager manager) throws SQLException {
         try {
             manager.updateDB("DROP TABLE USERS");
-        } catch (Exception e) {
-           //Table doesn't exist
+        } catch (SQLException e) {
+            // Table doesn't exist, continue with creation
         }
         manager.updateDB(CREATE_USERS_TABLE);
     }
     
-    public static void createBookingsTable(DBManager manager) {
+    /**
+     * Creates the bookings table in the database
+     * Drops the existing table if it exists before creating a new one
+     * @param manager DBManager instance for database operations
+     * @throws SQLException if there is an error creating the table
+     */
+    public static void createBookingsTable(DBManager manager) throws SQLException {
         try {
             manager.updateDB("DROP TABLE BOOKINGS");
-        } catch (Exception e) {
-            // Table doesn't exist
+        } catch (SQLException e) {
+            // Table doesn't exist, continue with creation
         }
-       manager.updateDB(CREATE_BOOKINGS_TABLE);
+        manager.updateDB(CREATE_BOOKINGS_TABLE);
     } 
 
-    public static void createBookingTypeTable(DBManager manager) {
+    /**
+     * Creates the booking type table in the database
+     * Drops the existing table if it exists before creating a new one
+     * @param manager DBManager instance for database operations
+     * @throws SQLException if there is an error creating the table
+     */
+    public static void createBookingTypeTable(DBManager manager) throws SQLException {
         try {
-            manager.updateDB("DROP TABLE BOOKINGS");
-        } catch (Exception e) {
-            // Table doesn't exist
+            manager.updateDB("DROP TABLE booking_type");
+        } catch (SQLException e) {
+            // Table doesn't exist, continue with creation
         }
-       manager.updateDB(CREATE_BOOKING_TYPE);
+        manager.updateDB(CREATE_BOOKING_TYPE);
     } 
-   
-    }
+}
 
