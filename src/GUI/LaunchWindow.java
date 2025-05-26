@@ -149,13 +149,15 @@ public class LaunchWindow extends javax.swing.JFrame {
 
     private void login_button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_login_button1ActionPerformed
         // TODO add your handling code here:
-        if (username_field.getText().trim().isEmpty() && password_field.getText().isEmpty()) {
+        if (username_field.getText().trim().isEmpty() && password_field.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Username and password empty");
             
-            
         } else if (username_field.getText().equals("admin") && new String(password_field.getPassword()).equals("admin")) {
+            JOptionPane.showMessageDialog(this, "Loggged in as Admin (Note: You are able to view sensitive data be careful)");
              new AdminWindow().setVisible(true);
              this.hide();
+        } else {
+            JOptionPane.showMessageDialog(this, "Incorrect credentials");
         }
     }//GEN-LAST:event_login_button1ActionPerformed
 

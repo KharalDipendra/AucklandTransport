@@ -21,7 +21,7 @@ public class cardManager {
         Card card = new Card();
         user.setCardNumber(card.getCardNumber());
         // update table
-        UsersDB.updateUser(user, manager);
+//        UsersDB.updateUser(user, manager);
         return card.getCardNumber();
     }
 }

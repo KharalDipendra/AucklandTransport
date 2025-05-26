@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 public class DBManager {
     /** Database connection object */
     private Connection conn;
+    
+    
     /** SQL statement object for executing queries */
     private Statement statement;
 

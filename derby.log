@@ -1,7 +1,7 @@
-Sat May 10 15:08:06 NZST 2025 : Apache Derby Network Server - 10.17.1.0 - (1913217) started and ready to accept connections on port 1527
+Mon May 26 20:32:22 NZST 2025 : Apache Derby Network Server - 10.17.1.0 - (1913217) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Sat May 10 15:08:06 NZST 2025:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instance a816c00e-0196-b82a-0dd9-00007e7736cd 
+Mon May 26 20:32:22 NZST 2025:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instance a816c00e-0197-0bb8-ae03-00007e7736cd 
 on database directory C:\Users\scara\Desktop\AucklandTransport\TransportDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@70dea4e 
 Loaded from file:/C:/Users/scara/Desktop/AucklandTransport/db-derby-10.17.1.0-bin/lib/derby.jar
 java.vendor=Oracle Corporation

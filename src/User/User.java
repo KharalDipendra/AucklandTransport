@@ -1,72 +1,104 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package User;
 
 /**
- *
- * @author GGPC
+ * Represents a user in the Auckland Transport app.
  */
 public class User {
 
-    private String email;
+    private int id;
     private String name;
+    private String email;
     private String password;
-    private Double card_money;
     private String cardNumber;
+    private double balance;
+    private String USER_ROLE;  // 'Admin' or 'Member'
 
-    public User(String name,String email,String password) {
+    /**
+     * Constructor with role. Balance defaults to 0.0, cardNumber defaults to null.
+     * USER_ROLE should be either "Admin" or "Member".
+     */
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.card_money = 0.0;
-        this.cardNumber = "";
+        this.balance = 0.0;
     }
+
+    // --- ID ---
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // --- Name ---
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    // --- Email ---
     public String getEmail() {
-      return this.email;
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    // --- Password ---
     public String getPassword() {
-       return this.password;
+        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public void setBalance(Double card_money) {
-        this.card_money = card_money;
-    }
-
-    public double getBalance() {
-        return this.card_money;
+    // --- Card Number ---
+    public String getCardNumber() {
+        return cardNumber;
     }
 
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
     }
 
-    public String getCardNumber() {
-        return this.cardNumber;
+    // --- Balance ---
+    public double getBalance() {
+        return balance;
     }
 
-    public boolean hasCard() {
-        return cardNumber != null && !cardNumber.isEmpty() && !cardNumber.equals("NULL");
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 
-    
-    
+    // --- User Role ---
+    public String getUserRole() {
+        return USER_ROLE;
+    }
+
+    public void setUserRole(String USER_ROLE) {
+        this.USER_ROLE = USER_ROLE;
+    }
+
+    // --- Member Type alias ---
+    /**
+     * Alias for getting the memberType (USER_ROLE).
+     */
+    public String getMemberType() {
+        return USER_ROLE;
+    }
+
+    /**
+     * Alias for setting the memberType (USER_ROLE).
+     */
+    public void setMemberType(String memberType) {
+        this.USER_ROLE = memberType;
+    }
 }

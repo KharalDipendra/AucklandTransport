@@ -1,4 +1,5 @@
 import Database.DBManager;
+import Database.Tables;
 import GUI.*;
 import java.sql.SQLException;
 
@@ -13,16 +14,13 @@ public class Main {
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         // TODO code application logic here
-        new LaunchWindow().setVisible(true);
-        initializeDatabase();
-
-    }
-
-    public static void initializeDatabase() throws SQLException {
         DBManager manager = new DBManager();
-        manager.getConnection();
-        manager.createTable(); // This will create all necessary tables
-        System.out.println("Database initialized successfully!");
+        /** only run when you want to Delete the previous tables and start fresh (NOT NEEDED FOR NOW) - Dipendra
+         * Tables.createUsersTable(manager);
+         * Tables.createBookingsTable(manager);
+         * Tables.createBookingTypeTable(manager);
+         */
+        new LaunchWindow().setVisible(true);
     }
 }
    
