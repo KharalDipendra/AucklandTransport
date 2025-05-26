@@ -173,10 +173,10 @@ public class Register extends javax.swing.JFrame {
         }
        
         //Check for valid email using Regular expression 
-        
         Pattern valid_email = Pattern.compile("\\b[\\w.%-]+@[-.\\w]+\\.[A-Za-z]{2,4}\\b");
         Matcher check_email = valid_email.matcher(email);
-   
+        
+        //Check if the email entered matches the regex pattern if not throw an error
         if (!check_email.matches()) {
             JOptionPane.showMessageDialog(this, "Invalid email example:\n someone@domain.com");
             return;
@@ -186,7 +186,7 @@ public class Register extends javax.swing.JFrame {
         User newUser = new User(username, email, password);
         UsersDB usersDB = new UsersDB();
         boolean created = usersDB.addUser(newUser);
-
+        
         if (created) {
             JOptionPane.showMessageDialog(this,"Account was made successfully you may now login");
             username_field.setText("");

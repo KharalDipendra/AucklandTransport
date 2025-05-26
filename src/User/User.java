@@ -11,7 +11,7 @@ public class User {
     private String password;
     private String cardNumber;
     private double balance;
-    private String USER_ROLE;  // 'Admin' or 'Member'
+    private String memberType;  // 'Admin' or 'Member'
 
     /**
      * Constructor with role. Balance defaults to 0.0, cardNumber defaults to null.
@@ -22,6 +22,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.balance = 0.0;
+        this.memberType = "Member";
     }
 
     // --- ID ---
@@ -80,11 +81,11 @@ public class User {
 
     // --- User Role ---
     public String getUserRole() {
-        return USER_ROLE;
+        return memberType;
     }
 
     public void setUserRole(String USER_ROLE) {
-        this.USER_ROLE = USER_ROLE;
+        this.memberType = USER_ROLE;
     }
 
     // --- Member Type alias ---
@@ -92,13 +93,13 @@ public class User {
      * Alias for getting the memberType (USER_ROLE).
      */
     public String getMemberType() {
-        return USER_ROLE;
+        return memberType;
     }
 
     /**
      * Alias for setting the memberType (USER_ROLE).
      */
     public void setMemberType(String memberType) {
-        this.USER_ROLE = memberType;
+        this.memberType = memberType;
     }
 }

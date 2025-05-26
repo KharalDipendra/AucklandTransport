@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
 
+
 /**
  * UsersDB handles CRUD operations for the USERS table.
  */
@@ -85,7 +86,7 @@ public class UsersDB {
             return false;
         }
     }
-
+    
     /**
      * Remove user by email.
      */
@@ -158,6 +159,41 @@ public class UsersDB {
             return false;
         }
     }
+    
+/**
+ * Returns the User if the given name/password pair is valid,
+ * or null if no matching record exists.
+ */
+public User authenticate(String name, String password) {
+    String sql = "SELECT * FROM USERS WHERE name = ? AND password = ?";
+    try (Connection conn = manager.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, name);
+        ps.setString(2, password);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                
+                // build a User object from the row
+                User u = new User(
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("password")
+                );
+                u.setMemberType(rs.getString("memberType"));
+                u.setCardNumber(rs.getString("cardNumber"));
+                u.setBalance(rs.getDouble("topUp"));
+                return u;
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(UsersDB.class.getName())
+              .log(Level.SEVERE, null, ex);
+    }
+    return null;
+}
+
     /**
  * Retrieves all users from the USERS table.
  * @return List of User objects (empty if none)
