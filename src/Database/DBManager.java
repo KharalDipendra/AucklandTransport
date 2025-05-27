@@ -1,163 +1,82 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Database;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * DBManager class handles the core database operations and connection management.
- * It provides methods for establishing and managing database connections,
- * creating tables, and executing SQL statements.
+ * DBManager handles the core database connection and SQL execution.
+ * Responsibilities:
+ *  - Establish and manage a single Connection & Statement
+ *  - Execute SQL updates (DDL/DML)
+ *  - Cleanly close resources
  */
 public class DBManager {
-    /** Database connection object */
+    private static final String JDBC_URL = "jdbc:derby:TransportDB;create=true";
     private Connection conn;
-    
-    
-    /** SQL statement object for executing queries */
-    private Statement statement;
+    private Statement stmt;
 
     /**
-     * Constructor initializes the database connection
+     * Initialize and open the database connection.
      */
     public DBManager() {
         establishConnection();
-      //  createTable(); 
     }
 
     /**
-     * Shuts down the Derby database engine
+     * Establishes the JDBC connection and creates a Statement.
+     * Throws a RuntimeException on failure to avoid silent errors.
      */
-    public static void Shutdown() {
-        try {
-            DriverManager.getConnection("jdbc:derby:;shutdown=true");
-        } catch (SQLException e) {
-            System.out.println("Shutting down derby failed");
-        }
-    }
-
-    /**
-     * Gets the database connection, establishing it if necessary
-     * @return Connection object for database operations
-     */
-    public Connection getConnection() {
-        if (conn == null) {
-            establishConnection();
-        } 
-        return conn;
-    }
-    
-    /**
-     * Establishes a connection to the Derby database
-     * Creates the database if it doesn't exist
-     */
-    public final void establishConnection() {
-        if ( conn != null) {
+    private void establishConnection() {
+        if (conn != null) {
             return;
         }
-        
         try {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-            String dburl = "jdbc:derby:TransportDB;create=true";
-            conn = DriverManager.getConnection(dburl);
-            statement = conn.createStatement();
-            System.out.println("Database Connection Successful");
-        } catch (ClassNotFoundException ex) {
-            System.out.println("Database driver not found " + ex.getMessage());
-        } catch (SQLException ex) {
-            System.out.println("Database connection error " + ex.getMessage());
+            conn = DriverManager.getConnection(JDBC_URL);
+            stmt = conn.createStatement();
+            System.out.println("Database connected");
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException("Failed to initialize DB: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Creates all necessary database tables
-     * Creates booking types, users, and bookings tables
-     * @throws SQLException if there is an error creating any of the tables
+     * Returns the active Connection. Guaranteed non-null after construction.
      */
-    public void createTable() throws SQLException {
-        if (conn == null || statement == null) {
-            throw new SQLException("Database connection not initialized");
-        }
-        
+    public Connection getConnection() {
+        return conn;
+    }
+
+    /**
+     * Executes a SQL update/DDL statement.
+     * @param sql the SQL string (e.g. CREATE, INSERT, UPDATE, ALTER)
+     */
+    public void executeUpdate(String sql) {
         try {
-            // Create tables in correct order due to foreign key dependencies
-            Tables.createBookingTypeTable(this);
-            insertDefaultBookingTypes();
-            Tables.createUsersTable(this);
-            Tables.createBookingsTable(this);
+            stmt.executeUpdate(sql);
         } catch (SQLException e) {
-            throw new SQLException("Error creating tables: " + e.getMessage(), e);
-        }
-    }
-            
-    /**
-     * Executes an SQL update statement
-     * @param sql The SQL statement to execute
-     * @throws SQLException if there is an error executing the SQL statement
-     */
-    public void updateDB(String sql) throws SQLException {
-        if (statement == null) {
-            throw new SQLException("Statement is not initialized");
-        }
-        statement.executeUpdate(sql);
-    }
-    
-    /**
-     * Drops a table if it exists in the database
-     * @param tableName Name of the table to drop
-     */
-    public void dropTableifexist(String tableName) {
-        try {
-            DatabaseMetaData dbm = conn.getMetaData();
-            ResultSet tables = dbm.getTables(null,null, tableName.toUpperCase(),null);
-            if ( tables.next()) {
-                String dropSQL = "DROP TABLE " + tableName;
-                System.out.println("Dropped Existing Table " + tableName);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE,null,ex);
+            throw new RuntimeException("SQL execution failed: " + sql, e);
         }
     }
 
     /**
-     * Inserts default booking types (bus and train) into the booking_type table
+     * Closes the Statement and Connection. Safe to call multiple times.
      */
-    public void insertDefaultBookingTypes() {
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("INSERT INTO booking_type (type) VALUES ('bus')");
-            stmt.executeUpdate("INSERT INTO booking_type (type) VALUES ('train')");
-        } catch (SQLException e) {
-            System.out.println("Might already exist: " + e.getMessage());
-        }
-    }
-     
-    /**
-     * Closes the database connection and statement
-     * Should be called when the database operations are complete
-     */
-    public void closeConnection() {
-        if (statement != null) {
+    public void close() {
+        if (stmt != null) {
             try {
-                statement.close();
-            } catch (SQLException ex) {
-                System.out.println("Error closing statement " + ex.getMessage());
+                stmt.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing Statement: " + e.getMessage());
             }
         }
-            
         if (conn != null) {
             try {
                 conn.close();
-            } catch (SQLException ex) {
-                System.out.println("Error closing connection " + ex.getMessage());
+            } catch (SQLException e) {
+                System.err.println("Error closing Connection: " + e.getMessage());
             }
         }
     }
