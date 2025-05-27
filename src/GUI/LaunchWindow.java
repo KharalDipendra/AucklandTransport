@@ -173,7 +173,9 @@ public class LaunchWindow extends javax.swing.JFrame {
        
         
            UsersDB db = new UsersDB();
+           
           User login = db.authenticate(name, password);
+          Session.setCurrentUser(login);
           if (login != null) {
               //Close login form
               this.dispose();
