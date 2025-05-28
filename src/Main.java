@@ -18,20 +18,19 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-
-        //Set the UI 
+        
         try {
             UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
             UIManager.put("TabbedPane.selectedBackground", Color.decode("#039BE5"));
             UIManager.put("TabbedPane.background", UIManager.getColor("Panel.background"));
             UIManager.put("TabbedPane.selectedForeground", Color.BLACK);
 
-            // Text fields / areas
+           
             UIManager.put("TextField.background", Color.WHITE);
             UIManager.put("TextField.foreground", Color.BLACK);
             UIManager.put("TextField.borderColor", Color.decode("#B0BEC5"));
 
-            // keep default buttons in your primary color even when unfocused
+          
             UIManager.put("Button.default.background", UIManager.getColor("Button.background"));
             UIManager.put("Button.default.hoverBackground", UIManager.getColor("Button.hoverBackground"));
             UIManager.put("Button.default.pressedBackground", UIManager.getColor("Button.pressedBackground"));
@@ -40,13 +39,11 @@ public class Main {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        // ② Now start your app
        
-        DBManager manager = new DBManager();
-        Tables.makeTable(manager);
-        new LaunchWindow().setVisible(true);
         
+        
+        DBManager manager = new DBManager();
+        new LaunchWindow().setVisible(true);
     }
 
 }
