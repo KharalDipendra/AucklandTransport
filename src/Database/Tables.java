@@ -19,11 +19,6 @@ public final class Tables {
         "discountType VARCHAR(20) DEFAULT 'Standard'" +
         ")";
 
-    private static final String CREATE_BOOKING_TYPE_TABLE =
-        "CREATE TABLE booking_type (" +
-        "typeId INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-        "typeName VARCHAR(20) NOT NULL" +
-        ")";
 
     private static final String CREATE_BOOKINGS_TABLE =
         "CREATE TABLE BOOKINGS (" +
@@ -60,7 +55,6 @@ public final class Tables {
 
         // Create tables
         manager.executeUpdate(CREATE_USERS_TABLE);
-        manager.executeUpdate(CREATE_BOOKING_TYPE_TABLE);
         manager.executeUpdate(CREATE_BOOKINGS_TABLE);
 
         System.out.println("All tables initialized");

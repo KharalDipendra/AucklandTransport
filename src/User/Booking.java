@@ -1,32 +1,101 @@
 package User;
+
 import java.time.LocalDate;
 
+/**
+ * Represents a transport booking for a user.
+ * Mirrors the BOOKINGS table schema:
+ * - bookingId INT (identity PK)
+ * - name VARCHAR(100)
+ * - email VARCHAR(150)
+ * - dateBooked DATE
+ * - departureDate DATE
+ * - serviceType VARCHAR(10)
+ */
 public class Booking {
-    private int id;
-    private int userId;
-    private String bookingType;
-    private LocalDate datebook;
-    private String departure;
+    private int bookingId;
+    private String name;
+    private String email;
+    private LocalDate dateBooked;
+    private LocalDate departureDate;
+    private String serviceType;
 
-    public Booking(int userId, String bookingType, String departure) {
-        this.userId = userId;
-        this.bookingType = bookingType;
-        this.departure = departure;
-        this.datebook = LocalDate.now();
+    /**
+     * No-arg constructor for frameworks and DAO use.
+     */
+    public Booking() {
     }
 
-    public int getId() { return id;}
-    public void setId(int id) { this.id = id;}
+    /**
+     * Full constructor for manual creation.
+     */
+    public Booking(int bookingId,
+                   String name,
+                   String email,
+                   LocalDate dateBooked,
+                   LocalDate departureDate,
+                   String serviceType) {
+        this.bookingId = bookingId;
+        this.name = name;
+        this.email = email;
+        this.dateBooked = dateBooked;
+        this.departureDate = departureDate;
+        this.serviceType = serviceType;
+    }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    // --- bookingId ---
+    public int getBookingId() {
+        return bookingId;
+    }
+    public void setBookingId(int bookingId) {
+        this.bookingId = bookingId;
+    }
 
-    public String getBookingType() { return bookingType; }
-    public void setBookingType(String bookingType) { this.bookingType = bookingType; }
-    public void setDateBooked(LocalDate datebook) { this.datebook = datebook; }
-    public LocalDate getDateBooked() { return datebook; }
+    // --- name ---
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getDeparture() { return departure; }
-    public void setDeparture(String departure) { this.departure = departure; }
+    // --- email ---
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // --- dateBooked ---
+    public LocalDate getDateBooked() {
+        return dateBooked;
+    }
+    public void setDateBooked(LocalDate dateBooked) {
+        this.dateBooked = dateBooked;
+    }
+
+    // --- departureDate ---
+    public LocalDate getDepartureDate() {
+        return departureDate;
+    }
+    public void setDepartureDate(LocalDate departureDate) {
+        this.departureDate = departureDate;
+    }
+
+    // --- serviceType ---
+    public String getServiceType() {
+        return serviceType;
+    }
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "Booking[id=%d, user=%s, type=%s, departure=%s]", 
+            bookingId, name, serviceType, departureDate
+        );
+    }
 }
-

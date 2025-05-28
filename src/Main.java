@@ -42,8 +42,11 @@ public class Main {
         }
 
         // ② Now start your app
+       
         DBManager manager = new DBManager();
+        Tables.makeTable(manager);
         new LaunchWindow().setVisible(true);
+        
     }
 
 }

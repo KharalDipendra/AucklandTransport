@@ -1,103 +1,91 @@
 package Database;
+
 import User.Booking;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.time.LocalDate;
 
 /**
  * BookingsDB class handles all database operations related to transport bookings.
- * This includes creating new bookings, retrieving booking information,
- * and managing booking types.
  */
 public class BookingsDB {
-    /** Database manager instance for handling database operations */
     private final DBManager manager;
 
-    /**
-     * Constructor initializes the database manager
-     * @param manager DBManager instance for database operations
-     */
     public BookingsDB(DBManager manager) {
         this.manager = manager;
     }
 
     /**
-     * Adds a new booking to the database
-     * @param booking The Booking object containing booking information
-     * @return true if the booking was successfully added, false otherwise
+     * Inserts a new booking and returns the generated bookingId.
      */
-    public boolean addBooking(Booking booking) {
-        String sql = "INSERT INTO BOOKINGS (userid, booking_type_id, dateBooked, departure) VALUES (?, ?, ?, ?)";
+    public int addBooking(
+            String name,
+            String email,
+            LocalDate dateBooked,
+            LocalDate departureDate,
+            String serviceType
+    ) throws SQLException {
+        String sql = "INSERT INTO BOOKINGS ("
+                + "name, email, dateBooked, departureDate, serviceType) "
+                + "VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = manager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(
+                     sql,
+                     new String[]{"BOOKINGID"}
+             )) {
 
-            // Get booking type id
-            int bookingTypeId = getBookingTypeId(booking.getBookingType());
-            if (bookingTypeId == -1) return false;
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setDate(3, Date.valueOf(dateBooked));
+            ps.setDate(4, Date.valueOf(departureDate));
+            ps.setString(5, serviceType);
 
-            pstmt.setInt(1, booking.getUserId());
-            pstmt.setInt(2, bookingTypeId);
-            pstmt.setDate(3, Date.valueOf(booking.getDateBooked()));
-            pstmt.setString(4, booking.getDeparture());
+            int count = ps.executeUpdate();
+            if (count != 1) {
+                throw new SQLException("Expected 1 row insert, got " + count);
+            }
 
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(BookingsDB.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys != null && keys.next()) {
+                    return keys.getInt(1);
+                } else {
+                    throw new SQLException("No generated key returned");
+                }
+            }
         }
     }
 
     /**
-     * Retrieves the ID of a booking type from the database
-     * @param type The booking type (e.g., 'bus' or 'train')
-     * @return The ID of the booking type, or -1 if not found
+     * Retrieves all bookings for a given user email.
      */
-    private int getBookingTypeId(String type) {
-        String sql = "SELECT id FROM booking_type WHERE type = ?";
+    public List<Booking> getBookingsForUser(String email) throws SQLException {
+        String sql = "SELECT bookingId, name, email, dateBooked, departureDate, serviceType "
+                   + "FROM BOOKINGS WHERE email = ? ORDER BY departureDate";
+        List<Booking> list = new ArrayList<>();
         try (Connection conn = manager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, type);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("id");
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Booking b = new Booking();
+                    b.setBookingId(rs.getInt("bookingId"));
+                    b.setName(rs.getString("name"));
+                    b.setEmail(rs.getString("email"));
+                    b.setDateBooked(rs.getDate("dateBooked").toLocalDate());
+                    b.setDepartureDate(rs.getDate("departureDate").toLocalDate());
+                    b.setServiceType(rs.getString("serviceType"));
+                    list.add(b);
+                }
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(BookingsDB.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return -1;
+        return list;
     }
 
-    /**
-     * Retrieves all bookings from the database
-     * @return List of all Booking objects in the database
-     */
-    public List<Booking> getAllBookings() {
-        List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT b.*, bt.type FROM BOOKINGS b JOIN booking_type bt ON b.booking_type_id = bt.id";
-
-        try (Connection conn = manager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                Booking booking = new Booking(
-                    rs.getInt("userid"),
-                    rs.getString("type"),
-                    rs.getString("departure")
-                );
-                booking.setId(rs.getInt("id"));
-                booking.setDateBooked(rs.getDate("dateBooked").toLocalDate());
-                bookings.add(booking);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(BookingsDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return bookings;
-    }
+    // TODO: add updateBooking/removeBooking methods as needed
 }
-
-
