@@ -1,12 +1,11 @@
 package Database;
-
 /**
  * Utility class for creating and initializing application tables.
  * Uses DBManager.executeUpdate(...) which wraps SQLExceptions in RuntimeExceptions.
  */
 public final class Tables {
     private Tables() { /* static only */ }
-
+    
     private static final String CREATE_USERS_TABLE =
         "CREATE TABLE USERS (" +
         "name VARCHAR(100) PRIMARY KEY, " +
@@ -18,8 +17,7 @@ public final class Tables {
         "memberSince DATE NOT NULL DEFAULT CURRENT_DATE, " +
         "discountType VARCHAR(20) DEFAULT 'Standard'" +
         ")";
-
-
+    
     private static final String CREATE_BOOKINGS_TABLE =
         "CREATE TABLE BOOKINGS (" +
         "bookingId INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
@@ -31,7 +29,14 @@ public final class Tables {
         "FOREIGN KEY (name) REFERENCES USERS(name), " +
         "FOREIGN KEY (email) REFERENCES USERS(email)" +
         ")";
-
+    
+    private static final String CREATE_DISCOUNT_REQUESTS_TABLE =
+        "CREATE TABLE DISCOUNT_REQUESTS (" +
+        "userName VARCHAR(100) PRIMARY KEY, " +
+        "requestedType VARCHAR(20) NOT NULL, " +
+        "approved BOOLEAN" +
+        ")";
+    
     /**
      * Drops a table if it exists by name; ignores errors if absent.
      */
@@ -43,20 +48,21 @@ public final class Tables {
             // ignore if table doesn't exist
         }
     }
-
+    
     /**
      * Drops all application tables (in correct order) and recreates them.
      */
     public static void makeTable(DBManager manager) {
         // Drop order to satisfy FK constraints
+        dropIfExists(manager, "DISCOUNT_REQUESTS");
         dropIfExists(manager, "BOOKINGS");
-        dropIfExists(manager, "booking_type");
         dropIfExists(manager, "USERS");
-
-        // Create tables
+        
+        // Create tables in dependency order
         manager.executeUpdate(CREATE_USERS_TABLE);
         manager.executeUpdate(CREATE_BOOKINGS_TABLE);
-
+        manager.executeUpdate(CREATE_DISCOUNT_REQUESTS_TABLE);
+        
         System.out.println("All tables initialized");
     }
 }

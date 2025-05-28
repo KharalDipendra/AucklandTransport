@@ -14,6 +14,7 @@ import java.time.LocalDate;
  * BookingsDB class handles all database operations related to transport bookings.
  */
 public class BookingsDB {
+
     private final DBManager manager;
 
     public BookingsDB(DBManager manager) {
@@ -33,11 +34,10 @@ public class BookingsDB {
         String sql = "INSERT INTO BOOKINGS ("
                 + "name, email, dateBooked, departureDate, serviceType) "
                 + "VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = manager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     sql,
-                     new String[]{"BOOKINGID"}
-             )) {
+        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(
+                sql,
+                new String[]{"BOOKINGID"}
+        )) {
 
             ps.setString(1, name);
             ps.setString(2, email);
@@ -65,10 +65,9 @@ public class BookingsDB {
      */
     public List<Booking> getBookingsForUser(String email) throws SQLException {
         String sql = "SELECT bookingId, name, email, dateBooked, departureDate, serviceType "
-                   + "FROM BOOKINGS WHERE email = ? ORDER BY departureDate";
+                + "FROM BOOKINGS WHERE email = ? ORDER BY departureDate";
         List<Booking> list = new ArrayList<>();
-        try (Connection conn = manager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {

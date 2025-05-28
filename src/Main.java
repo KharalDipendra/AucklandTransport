@@ -1,11 +1,9 @@
 
+import Database.BookingsDB;
 import Database.DBManager;
 import Database.Tables;
 import GUI.*;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.sql.SQLException;
 import javax.swing.UIManager;
 
@@ -40,10 +38,10 @@ public class Main {
             ex.printStackTrace();
         }
        
-        
-        
         DBManager manager = new DBManager();
+        
         new LaunchWindow().setVisible(true);
+       
     }
 
 }
