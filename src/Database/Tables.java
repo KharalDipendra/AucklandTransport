@@ -1,4 +1,7 @@
 package Database;
+
+import GUI.ConfirmDB;
+
 /**
  * Utility class for creating and initializing application tables.
  * Uses DBManager.executeUpdate(...) which wraps SQLExceptions in RuntimeExceptions.
@@ -18,17 +21,19 @@ public final class Tables {
         "discountType VARCHAR(20) DEFAULT 'Standard'" +
         ")";
     
-    private static final String CREATE_BOOKINGS_TABLE =
-        "CREATE TABLE BOOKINGS (" +
-        "bookingId INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-        "name VARCHAR(100) NOT NULL, " +
-        "email VARCHAR(150) NOT NULL, " +
-        "dateBooked DATE NOT NULL, " +
-        "departureDate DATE NOT NULL, " +
-        "serviceType VARCHAR(10) NOT NULL, " +
-        "FOREIGN KEY (name) REFERENCES USERS(name), " +
-        "FOREIGN KEY (email) REFERENCES USERS(email)" +
-        ")";
+ private static final String CREATE_BOOKINGS_TABLE =
+    "CREATE TABLE BOOKINGS (" +
+      "bookingId     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+      "username      VARCHAR(100) NOT NULL,               " + 
+      "email         VARCHAR(150) NOT NULL,               " +
+      "dateBooked    DATE NOT NULL,                       " +
+      "departureDate DATE NOT NULL,                       " +
+      "destination   VARCHAR(10) NOT NULL,               " + 
+      "price DECIMAL(10,2), " +
+      "serviceType   VARCHAR(50)  NOT NULL,               " + 
+      "FOREIGN KEY (email) REFERENCES USERS(email)        " +
+    ")";
+
     
     private static final String CREATE_DISCOUNT_REQUESTS_TABLE =
         "CREATE TABLE DISCOUNT_REQUESTS (" +
@@ -64,5 +69,10 @@ public final class Tables {
         manager.executeUpdate(CREATE_DISCOUNT_REQUESTS_TABLE);
         
         System.out.println("All tables initialized");
+    }
+    
+    // CALL THIS NEVER CALL makeTABLE by itself
+    public static void createWindow() {
+      new ConfirmDB().setVisible(true);
     }
 }

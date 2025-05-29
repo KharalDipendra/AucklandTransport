@@ -18,18 +18,15 @@ public class Main {
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         
+        //Flatleaf plugin to change the defauly ugly SWING UI to something a bit more modern 
         try {
             UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
             UIManager.put("TabbedPane.selectedBackground", Color.decode("#039BE5"));
             UIManager.put("TabbedPane.background", UIManager.getColor("Panel.background"));
             UIManager.put("TabbedPane.selectedForeground", Color.BLACK);
-
-           
             UIManager.put("TextField.background", Color.WHITE);
             UIManager.put("TextField.foreground", Color.BLACK);
             UIManager.put("TextField.borderColor", Color.decode("#B0BEC5"));
-
-          
             UIManager.put("Button.default.background", UIManager.getColor("Button.background"));
             UIManager.put("Button.default.hoverBackground", UIManager.getColor("Button.hoverBackground"));
             UIManager.put("Button.default.pressedBackground", UIManager.getColor("Button.pressedBackground"));
@@ -39,16 +36,22 @@ public class Main {
             ex.printStackTrace();
         }
        
+        
+        //Create a new Database manager
         DBManager manager = new DBManager();
-        
         UsersDB database = new UsersDB(manager);
-        Tables.makeTable(manager);
-        
+//        Tables.createWindow();
+     
         //Set Someone admin on Launch so theres always an admin
         System.out.println("===ADMIN ACCOUNT ADDED===");
         database.updateUserRole("Dipendra@gmail.com", "ADMIN");
-        System.out.println(database.checkStatus("omg@gmail.com"));
-        System.out.println(database.checkStatus("Dipendra@gmail.com"));
+        System.out.println("OMG Exists: " + database.checkStatus("omg@gmail.com"));
+        System.out.println("Dipendra exists: " + database.checkStatus("Dipendra@gmail.com"));
+        
+        //Only Open if you wanna make tables 
+//        Tables.createWindow();
+       
+        
         new LaunchWindow().setVisible(true);
        
     }

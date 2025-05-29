@@ -41,7 +41,7 @@ public class DBManager {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
             conn = DriverManager.getConnection(JDBC_URL);
             stmt = conn.createStatement();
-            System.out.println("Database connected");
+            System.out.println("Databse connected");
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException("Failed to initialize DB: " + e.getMessage(), e);
         }

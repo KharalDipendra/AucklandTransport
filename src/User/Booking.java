@@ -19,6 +19,9 @@ public class Booking {
     private LocalDate dateBooked;
     private LocalDate departureDate;
     private String serviceType;
+    private String where;
+    private double PRICE;
+    
 
     /**
      * No-arg constructor for frameworks and DAO use.
@@ -41,8 +44,26 @@ public class Booking {
         this.dateBooked = dateBooked;
         this.departureDate = departureDate;
         this.serviceType = serviceType;
+        this.where = "NORTH";
+        this.PRICE = 0.0;
     }
-
+    
+    public double getPrice() {
+        return this.PRICE;
+    }
+    
+    public double setPrice(double new_price) {
+        return this.PRICE = new_price;
+    }
+    
+    public String getWhereTo() {
+        return this.where;
+    }
+    
+    public String setWhereTo(String new_where) {
+        //NORTH,EAST,SOUTH,WEST
+        return this.where = new_where;
+    }
     // --- bookingId ---
     public int getBookingId() {
         return bookingId;

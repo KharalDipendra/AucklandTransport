@@ -25,25 +25,29 @@ public class BookingsDB {
      * Inserts a new booking and returns the generated bookingId.
      */
     public int addBooking(
-            String name,
+            String username, // Changed from 'name' to match database
             String email,
             LocalDate dateBooked,
             LocalDate departureDate,
+            String destination, // Added destination parameter
+            Double price,
             String serviceType
     ) throws SQLException {
         String sql = "INSERT INTO BOOKINGS ("
-                + "name, email, dateBooked, departureDate, serviceType) "
-                + "VALUES (?, ?, ?, ?, ?)";
+                + "username, email, dateBooked, departureDate, destination,price, serviceType) "
+                + "VALUES (?, ?, ?, ?, ?, ?,?)";
         try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(
                 sql,
                 new String[]{"BOOKINGID"}
         )) {
 
-            ps.setString(1, name);
+            ps.setString(1, username);  // Match database column name
             ps.setString(2, email);
             ps.setDate(3, Date.valueOf(dateBooked));
             ps.setDate(4, Date.valueOf(departureDate));
-            ps.setString(5, serviceType);
+            ps.setString(5, destination);  // Add destination
+            ps.setDouble(6, price);
+            ps.setString(7, serviceType);
 
             int count = ps.executeUpdate();
             if (count != 1) {
@@ -64,7 +68,8 @@ public class BookingsDB {
      * Retrieves all bookings for a given user email.
      */
     public List<Booking> getBookingsForUser(String email) throws SQLException {
-        String sql = "SELECT bookingId, name, email, dateBooked, departureDate, serviceType "
+        // Fixed: Match the actual database column names from Tables.java
+        String sql = "SELECT bookingId, username, email, dateBooked, departureDate, destination, price, serviceType "
                 + "FROM BOOKINGS WHERE email = ? ORDER BY departureDate";
         List<Booking> list = new ArrayList<>();
         try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -74,10 +79,14 @@ public class BookingsDB {
                 while (rs.next()) {
                     Booking b = new Booking();
                     b.setBookingId(rs.getInt("bookingId"));
-                    b.setName(rs.getString("name"));
+                    // Fixed: Database has 'username' column, but Booking class uses 'name' field
+                    b.setName(rs.getString("username"));
                     b.setEmail(rs.getString("email"));
                     b.setDateBooked(rs.getDate("dateBooked").toLocalDate());
                     b.setDepartureDate(rs.getDate("departureDate").toLocalDate());
+                    // Fixed: Use lowercase 'destination' to match database
+                    b.setWhereTo(rs.getString("destination"));
+                    b.setPrice(rs.getDouble("price"));
                     b.setServiceType(rs.getString("serviceType"));
                     list.add(b);
                 }
