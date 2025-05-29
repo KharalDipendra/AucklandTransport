@@ -142,6 +142,7 @@ public class UsersDB {
             return false;
         }
     }
+
     /**
      * Update only the cardNumber field.
      */
@@ -188,7 +189,42 @@ public class UsersDB {
         }
         return null;
     }
-    
-   
-    
+
+    public boolean updateUserRole(String email, String role_name) {
+        String sql = "UPDATE USERS SET MEMBERTYPE = ? WHERE email = ?";
+        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, role_name);
+            ps.setString(2, email);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    //Check if a Email exists in the database if so return 0 or 1 
+    public boolean checkStatus(String email) {
+    String sql = "SELECT COUNT(*) FROM USERS WHERE email = ?";
+    // keep your one Connection open
+    Connection conn = manager.getConnection();
+    try (
+        // only auto-close the PreparedStatement and ResultSet
+        PreparedStatement ps = conn.prepareStatement(sql)
+    ) {
+        // 1️⃣ bind BEFORE you run the query
+        ps.setString(1, email);
+
+        // 2️⃣ now execute and grab the one-row resultset
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                // 3️⃣ true if there's at least one match
+                return rs.getInt(1) > 0;
+            }
+        }
+    } catch (SQLException ex) {
+        logger.log(Level.SEVERE, "Error checking user status", ex);
+    }
+    // no matches or an error
+    return false;
+}
 }

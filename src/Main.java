@@ -2,6 +2,7 @@
 import Database.BookingsDB;
 import Database.DBManager;
 import Database.Tables;
+import Database.UsersDB;
 import GUI.*;
 import java.awt.Color;
 import java.sql.SQLException;
@@ -40,6 +41,14 @@ public class Main {
        
         DBManager manager = new DBManager();
         
+        UsersDB database = new UsersDB(manager);
+        Tables.makeTable(manager);
+        
+        //Set Someone admin on Launch so theres always an admin
+        System.out.println("===ADMIN ACCOUNT ADDED===");
+        database.updateUserRole("Dipendra@gmail.com", "ADMIN");
+        System.out.println(database.checkStatus("omg@gmail.com"));
+        System.out.println(database.checkStatus("Dipendra@gmail.com"));
         new LaunchWindow().setVisible(true);
        
     }
