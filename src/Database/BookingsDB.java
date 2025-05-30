@@ -94,6 +94,18 @@ public class BookingsDB {
         }
         return list;
     }
+    
+    
+    //Removing a booking
+     
+   public boolean deleteBooking(int bookingId) throws SQLException {
+    String sql = "DELETE FROM BOOKINGS WHERE bookingId = ?";
+    try (Connection conn = manager.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, bookingId);
+        return ps.executeUpdate() > 0;
+    }
+}
 
     // TODO: add updateBooking/removeBooking methods as needed
 }

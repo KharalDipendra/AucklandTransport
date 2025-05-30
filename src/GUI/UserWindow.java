@@ -5,6 +5,7 @@ import Database.DBManager;
 import Database.UsersDB;
 import User.*;
 import card.cardManager;
+
 import java.awt.GridLayout;
 import java.security.interfaces.RSAKey;
 import java.sql.SQLException;
@@ -21,11 +22,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 import org.apache.derby.iapi.sql.PreparedStatement;
 import org.apache.derby.iapi.sql.ResultSet;
+import org.apache.derby.impl.sql.execute.CurrentDatetime;
 
 /**
- *
  * @author scara
  */
 public class UserWindow extends javax.swing.JFrame {
@@ -50,35 +52,32 @@ public class UserWindow extends javax.swing.JFrame {
 
         refreshCardUI();
 
-        
     }
-    
-    
+
     private void showBookingConfirmation(User current,
-                                     LocalDate dateBooked,
-                                     LocalDate departureDate,
-                                     String destination,
-                                     String serviceType,
-                                     double price) {
-    String receipt =
-        "Booking Confirmation\n" +
-        "---------------------\n" +
-        "Name          : " + current.getName()        + "\n" +
-        "Email         : " + current.getEmail()       + "\n" +
-        "Date Booked   : " + dateBooked               + "\n" +
-        "Departure Date: " + departureDate            + "\n" +
-        "Destination   : " + destination              + "\n" +
-        "Service Type  : " + serviceType              + "\n" +
-        "Price         : $" + String.format("%.2f", price) + "\n" +
-        "---------------------\n" +
-        "Thank you for booking with AT HOP!\n" +
-        "---------------------\n" +
-        "Check the Bookings tab to view your booking.\n" +
-        "Safe travels :)";
+            LocalDate dateBooked,
+            LocalDate departureDate,
+            String destination,
+            String serviceType,
+            double price) {
+        String receipt
+                = "Booking Confirmation\n"
+                + "---------------------\n"
+                + "Name          : " + current.getName() + "\n"
+                + "Email         : " + current.getEmail() + "\n"
+                + "Date Booked   : " + dateBooked + "\n"
+                + "Departure Date: " + departureDate + "\n"
+                + "Destination   : " + destination + "\n"
+                + "Service Type  : " + serviceType + "\n"
+                + "Price         : $" + String.format("%.2f", price) + "\n"
+                + "---------------------\n"
+                + "Thank you for booking with AT HOP!\n"
+                + "---------------------\n"
+                + "Check the Bookings tab to view your booking.\n"
+                + "Safe travels :)";
 
-    fare_booking_info.setText(receipt);
-}
-
+        fare_booking_info.setText(receipt);
+    }
 
     private void updateTable() {
         String sql = "SELECT bookingId, username, email, dateBooked, departureDate, Destination,Price, serviceType "
@@ -107,7 +106,7 @@ public class UserWindow extends javax.swing.JFrame {
                     books.getWhereTo(),
                     books.getServiceType(),
                     books.getPrice()
-                    
+
                 });
             }
 
@@ -206,7 +205,6 @@ public class UserWindow extends javax.swing.JFrame {
         jLabel23 = new javax.swing.JLabel();
         update_booking = new javax.swing.JToggleButton();
         delete_table = new javax.swing.JButton();
-        edit_booking = new javax.swing.JToggleButton();
         edit_booking1 = new javax.swing.JToggleButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -326,7 +324,7 @@ public class UserWindow extends javax.swing.JFrame {
                                     .addComponent(discount_type)
                                     .addComponent(name_placeholder)
                                     .addComponent(card_number))))
-                        .addContainerGap(342, Short.MAX_VALUE))
+                        .addContainerGap(81, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel15)
@@ -464,7 +462,7 @@ public class UserWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(balance))
                             .addComponent(jLabel6))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 572, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 311, Short.MAX_VALUE)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                                 .addComponent(no_card_txt)
@@ -628,7 +626,7 @@ public class UserWindow extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(pay_button, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 267, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel17)
@@ -675,20 +673,20 @@ public class UserWindow extends javax.swing.JFrame {
 
         booking_table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Your email", "Date booked", "Departure Date", "Destination", "Service type", "Price"
+                "ID", "Name", "Date booked", "Departure Date", "Service type"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -722,8 +720,11 @@ public class UserWindow extends javax.swing.JFrame {
         });
 
         delete_table.setText("Delete booking");
-
-        edit_booking.setText("Edit booking");
+        delete_table.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delete_tableActionPerformed(evt);
+            }
+        });
 
         edit_booking1.setText("View in Detail");
         edit_booking1.addActionListener(new java.awt.event.ActionListener() {
@@ -738,19 +739,14 @@ public class UserWindow extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)
+                .addGap(37, 37, 37)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addGap(19, 19, 19)
-                            .addComponent(jLabel23))
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(update_booking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(delete_table, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(edit_booking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(edit_booking1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addComponent(jLabel23)
+                    .addComponent(update_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(edit_booking1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(delete_table, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -764,8 +760,6 @@ public class UserWindow extends javax.swing.JFrame {
                         .addGap(10, 10, 10)
                         .addComponent(edit_booking1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(edit_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
                         .addComponent(delete_table, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE))
@@ -782,7 +776,7 @@ public class UserWindow extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel7)
-                .addGap(0, 930, Short.MAX_VALUE))
+                .addGap(0, 669, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -924,12 +918,28 @@ public class UserWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
 
         LocalDate departure_date = calender.getSelectedDate();
+        LocalDate current_date = LocalDate.now();
+        
+        if (!departure_date.isAfter(current_date)) {
+            JOptionPane.showMessageDialog(this, "Pick a valid date thats after today");
+            return;
+        }
+        
         //Error if no date is picked otherwise it will give a null exception
         if (departure_date == null) {
             JOptionPane.showMessageDialog(this, "Pick a date first");
             return;
         }
+        
+//        int current_day = calender.getSelectedDate().
+//        if (current_day < (int) departure_date.getMonthValue()) {
+//            JOptionPane.showMessageDialog(this, "Select a valid date");
+//            return;
+//        }
+        
         String s = departure_date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        
+                
         System.out.println("Booking info");
         String type = (String) ferry_type.getSelectedItem();
         System.out.println("Type: " + type);
@@ -940,9 +950,9 @@ public class UserWindow extends javax.swing.JFrame {
         String getDestination = (String) location.getSelectedItem();
         //Get current userInfo
         User current = Session.getCurrentUser();
-        
+
         Double price = Double.valueOf(fare_price.getText());
-        
+
         DBManager manager = new DBManager();
         BookingsDB booking = new BookingsDB(manager);
         if (current.getCardNumber() == null) {
@@ -950,7 +960,7 @@ public class UserWindow extends javax.swing.JFrame {
             return;
         }
         try {
-            int db = booking.addBooking(current.getName(), current.getEmail(), dateBooked, departure_date,getDestination, price, type);
+            int db = booking.addBooking(current.getName(), current.getEmail(), dateBooked, departure_date, getDestination, price, type);
             System.out.println("Added Booking success");
             showBookingConfirmation(current, dateBooked, departure_date, getDestination, type, price);
         } catch (SQLException ex) {
@@ -990,22 +1000,21 @@ public class UserWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
         int viewRow = booking_table.getSelectedRow();
         if (viewRow < 0) {
-            JOptionPane.showMessageDialog(this, "Select collum to view");
+            JOptionPane.showMessageDialog(this, "Select a booking to view in detail");
             return;
         }
-        
+
         User current = Session.getCurrentUser();
-        
+
         int modelRow = booking_table.convertRowIndexToModel(viewRow);
-        
-       BookingsDB bookings = new BookingsDB(new DBManager());
+
+        BookingsDB bookings = new BookingsDB(new DBManager());
         try {
             List<Booking> bookingInfo = bookings.getBookingsForUser(current.getEmail());
             ReciptPanel recipt = new ReciptPanel();
             recipt.setVisible(true);
             recipt.displayBooking(bookingInfo.get(modelRow));
-            
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(UserWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1018,6 +1027,46 @@ public class UserWindow extends javax.swing.JFrame {
         balance.setText(Double.toString(user.getBalance()));
         repaint();
     }//GEN-LAST:event_topup_buttonActionPerformed
+
+    private void delete_tableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_tableActionPerformed
+        // TODO add your handling code here:
+        int viewRow = booking_table.getSelectedRow();
+        if (viewRow < 0) {
+            JOptionPane.showMessageDialog(this, "Select a booking first ");
+            return;
+        }
+        int modelRow = booking_table.convertRowIndexToModel(viewRow);
+
+        Booking toDelete = new Booking();
+
+        BookingsDB userBookings = new BookingsDB(new DBManager());
+        User user = Session.getCurrentUser();
+        try {
+            List<Booking> bookingData = userBookings.getBookingsForUser(user.getEmail());
+            Booking userID = bookingData.get(modelRow);
+            int choice = JOptionPane.showConfirmDialog(this,
+                    "Please confirm the deleton of: " + userID.getBookingId() + "?",
+                    "",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (choice != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            boolean ok = userBookings.deleteBooking(userID.getBookingId());
+
+            if (ok) {
+                updateTable();
+                JOptionPane.showMessageDialog(rootPane, "Deleted");
+            } else {
+                JOptionPane.showMessageDialog(this, "Problem deleting your booking try again in a sort time");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserWindow.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Database error could not delete databse");
+
+        }
+    }//GEN-LAST:event_delete_tableActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1046,7 +1095,6 @@ public class UserWindow extends javax.swing.JFrame {
     private javax.swing.JLabel card_number;
     private javax.swing.JButton delete_table;
     private javax.swing.JLabel discount_type;
-    private javax.swing.JToggleButton edit_booking;
     private javax.swing.JToggleButton edit_booking1;
     private javax.swing.JLabel email_placeholder;
     private javax.swing.JTextArea fare_booking_info;

@@ -150,7 +150,7 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="342" max="32767" attributes="0"/>
+                              <EmptySpace pref="81" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="32767" attributes="0"/>
@@ -408,7 +408,7 @@
                                   </Group>
                                   <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="572" max="32767" attributes="0"/>
+                              <EmptySpace pref="311" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
                                       <Component id="no_card_txt" min="-2" max="-2" attributes="0"/>
@@ -677,7 +677,7 @@
                                       <Component id="pay_button" min="-2" pref="351" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="267" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                               <Component id="jLabel8" min="-2" pref="210" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -888,23 +888,15 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane3" pref="903" max="32767" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="jScrollPane3" pref="596" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                                  <Component id="jLabel23" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="update_booking" max="32767" attributes="0"/>
-                                  <Component id="delete_table" min="-2" pref="148" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="edit_booking" alignment="1" min="-2" pref="148" max="-2" attributes="0"/>
-                          </Group>
-                          <Component id="edit_booking1" min="-2" pref="148" max="-2" attributes="0"/>
+                          <Component id="jLabel23" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="update_booking" alignment="0" min="-2" pref="148" max="-2" attributes="0"/>
+                          <Component id="edit_booking1" alignment="0" min="-2" pref="148" max="-2" attributes="0"/>
+                          <Component id="delete_table" min="-2" pref="148" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -920,8 +912,6 @@
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                               <Component id="edit_booking1" min="-2" pref="53" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="edit_booking" min="-2" pref="53" max="-2" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="delete_table" min="-2" pref="58" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -943,34 +933,16 @@
                 <Component class="javax.swing.JTable" name="booking_table">
                   <Properties>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                      <Table columnCount="8" rowCount="4">
+                      <Table columnCount="5" rowCount="4">
                         <Column editable="false" title="ID" type="java.lang.Integer"/>
                         <Column editable="false" title="Name" type="java.lang.String"/>
-                        <Column editable="false" title="Your email" type="java.lang.String"/>
                         <Column editable="false" title="Date booked" type="java.lang.Object"/>
                         <Column editable="false" title="Departure Date" type="java.lang.Object"/>
-                        <Column editable="false" title="Destination" type="java.lang.String"/>
                         <Column editable="false" title="Service type" type="java.lang.String"/>
-                        <Column editable="false" title="Price" type="java.lang.Object"/>
                       </Table>
                     </Property>
                     <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                       <TableColumnModel selectionModel="0">
-                        <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                          <Title/>
-                          <Editor/>
-                          <Renderer/>
-                        </Column>
-                        <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                          <Title/>
-                          <Editor/>
-                          <Renderer/>
-                        </Column>
-                        <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                          <Title/>
-                          <Editor/>
-                          <Renderer/>
-                        </Column>
                         <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                           <Title/>
                           <Editor/>
@@ -1031,11 +1003,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Delete booking"/>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JToggleButton" name="edit_booking">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Edit booking"/>
-              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="delete_tableActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JToggleButton" name="edit_booking1">
               <Properties>
@@ -1061,7 +1031,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="930" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="669" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
