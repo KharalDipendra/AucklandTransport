@@ -1,2 +1,11 @@
 /dist/
 /build/
+# Derby DB stuff
+TransportDB/
+*.lck
+*.log
+
+# NetBeans
+nbproject/private/
+build/
+dist/
