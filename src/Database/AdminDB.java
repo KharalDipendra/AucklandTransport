@@ -4,10 +4,10 @@
  */
 package Database;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet;
-import org.apache.derby.iapi.sql.PreparedStatement;
 
 /**
  *
@@ -20,6 +20,7 @@ public class AdminDB {
 
     public AdminDB(DBManager manager) {
         this.manager = manager;
+        this.conn = manager.getConnection();
     }
 
     public Connection getConnection() {
@@ -27,46 +28,49 @@ public class AdminDB {
     }
   
     //view all users method
-    public void viewallusers() throws SQLException {
+    public ResultSet viewallusers() throws SQLException {
         String SQL = "SELECT * FROM USERS";
-        Statement stmt = conn.createStatement(); 
-        ResultSet rs = stmt.executeQuery(SQL);
-        
-        while (rs.next()) {
-            System.out.println("EMAIL: " + rs.getString("email") +
-                               ", NAME: " + rs.getString("username"));
-                    
+        if (conn == null || conn.isClosed()) {
+            conn = manager.getConnection();
         }
-        rs.close();
-        stmt.close();
+        Statement stmt = conn.createStatement(); 
+        return stmt.executeQuery(SQL);
     }
     
     //attach action listener to method
     
     //view all bookings
-    public void viewallbookings() throws SQLException {
+    public ResultSet viewallbookings() throws SQLException {
         String SQL = "SELECT * FROM BOOKINGS";
         Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(SQL);
-        
-        while (rs.next()) {
-            System.out.println("BookingID: " + rs.getString("bookingID") + 
-                    ",Username : " + rs.getString("username") + 
-                    ",Email: " + rs.getString("email") + 
-                    ",DateBooked:  " + rs.getString("dateBooked") + 
-                    ",DepartureDate: " + rs.getString("departureDate") +
-                    ",Destination: " + rs.getString("destination") + 
-                    ",Price: " + rs.getString("price") + 
-                    ", ServiceType: " + rs.getString("serviceType"));
-                        }
-        
-            rs.close();
-            stmt.close();
+        return stmt.executeQuery(SQL);
     }
     
 
+    /**
+     * Remove user by email.
+     */
+    public boolean deleteUser(String email) {
+        String sql = "DELETE FROM USERS WHERE email = ?";
+        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
 
-    
-    
+    /**
+     * Remove booking by bookingID.
+     */
+    public boolean deleteBooking(String bookingID) {
+        String sql = "DELETE FROM BOOKINGS WHERE bookingID = ?";
+        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, bookingID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
 
 }
