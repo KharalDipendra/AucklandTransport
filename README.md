@@ -1,5 +1,14 @@
 # Auckland Transport Desktop App
 
+
+# NOTHING WILL WORK UNLESS YOU GO TO
+
+# * RESET DATABASE -> CONFIRM (DELETE ALL ENTRYS)
+
+***This is by design because derby doesn't have tables for us by default so we have to do it ourselves 
+if you run into this error you should be able to fix it.***
+
+
 This is a Java Swing desktop application for managing a fictional Auckland Transport system. It provides functionalities for both regular users and administrators. The application uses an embedded Apache Derby database for data persistence and features a modern UI theme using FlatLaf.
 
 ## Features
