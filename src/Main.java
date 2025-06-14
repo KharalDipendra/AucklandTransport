@@ -1,9 +1,9 @@
-
 import Database.BookingsDB;
 import Database.DBManager;
 import Database.Tables;
 import Database.UsersDB;
 import GUI.*;
+import User.User;
 import java.awt.Color;
 import java.sql.SQLException;
 import javax.swing.UIManager;
@@ -40,17 +40,13 @@ public class Main {
         //Create a new Database manager
         DBManager manager = new DBManager();
         UsersDB database = new UsersDB(manager);
-//        Tables.createWindow();
-     
-        //Set Someone admin on Launch so theres always an admin
-        System.out.println("===ADMIN ACCOUNT ADDED===");
-        database.updateUserRole("Dipendra@gmail.com", "ADMIN");
-        System.out.println("OMG Exists: " + database.checkStatus("omg@gmail.com"));
-        System.out.println("Dipendra exists: " + database.checkStatus("Dipendra@gmail.com"));
         
-        //Only Open if you wanna make tables 
-//        Tables.createWindow();
-       
+        
+        
+        //INITIAL WINDOW comment it out after first use unless you want to reset the database and start again
+        Tables.createWindow();
+        //Ensure theres always an admin entry by default
+      
         
         new LaunchWindow().setVisible(true);
        

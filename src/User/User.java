@@ -39,66 +39,74 @@ public class User {
         this.discountType = "Standard";
     }
 
-    // --- Name ---
+    // gets the users name
     public String getName() {
         return name;
     }
+    // sets the users name
     public void setName(String name) {
         this.name = name;
     }
 
-    // --- Email ---
+    // gets the users email
     public String getEmail() {
         return email;
     }
+    // sets the users email
     public void setEmail(String email) {
         this.email = email;
     }
 
-    // --- Password ---
+    // gets the users password
     public String getPassword() {
         return password;
     }
+    // sets the users password
     public void setPassword(String password) {
         this.password = password;
     }
 
-    // --- Card Number ---
+    // gets the users card number
     public String getCardNumber() {
         return cardNumber;
     }
+    // sets the users card number
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
     }
 
-    // --- Balance (topUp) ---
+    // gets the users balance
     public double getBalance() {
         return balance;
     }
+    // sets the users balance
     public void setBalance(double balance) {
         this.balance = balance;
     }
 
-    // --- Member Type ---
+    // gets the users member type
     public String getMemberType() {
         return memberType;
     }
+    // sets the users member type
     public void setMemberType(String memberType) {
         this.memberType = memberType;
     }
 
-    // --- Member Since ---
+    // gets the date the user joined
     public LocalDate getMemberSince() {
         return memberSince;
     }
+    // sets the date the user joined
     public void setMemberSince(LocalDate memberSince) {
         this.memberSince = memberSince;
     }
 
-    // --- Discount Type ---
+    // gets the users discount type
     public String getDiscountType() {
         return discountType;
     }
+    // sets the users discount type
     public void setDiscountType(String discountType) {
         this.discountType = discountType;
     }

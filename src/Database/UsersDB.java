@@ -12,6 +12,9 @@ import java.sql.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 /**
  * UsersDB handles CRUD operations for the USERS table.
@@ -21,12 +24,24 @@ public class UsersDB {
     private final DBManager manager;
     private static final Logger logger = Logger.getLogger(UsersDB.class.getName());
 
+    // creates a new database manager
     public UsersDB() {
         this.manager = new DBManager();
     }
 
+    // uses a shared database manager
     public UsersDB(DBManager manager) {
         this.manager = manager;
+    }
+
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -85,7 +100,7 @@ public class UsersDB {
             ps.setString(6, user.getEmail());
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, "Error updating user: " + ex.getMessage(), ex);
             return false;
         }
     }
@@ -160,9 +175,10 @@ public class UsersDB {
 
     /**
      * Returns the User if the given name/password pair is valid, or null if no matching record exists.
+     * Username check is case-insensitive.
      */
     public User authenticate(String name, String password) {
-        String sql = "SELECT * FROM USERS WHERE name = ? AND password = ?";
+        String sql = "SELECT * FROM USERS WHERE UPPER(name) = UPPER(?) AND password = ?";
         try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, name);
@@ -170,7 +186,6 @@ public class UsersDB {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-
                     // build a User object from the row
                     User u = new User(
                             rs.getString("name"),
@@ -190,6 +205,7 @@ public class UsersDB {
         return null;
     }
 
+    // updates a users role
     public boolean updateUserRole(String email, String role_name) {
         String sql = "UPDATE USERS SET MEMBERTYPE = ? WHERE email = ?";
         try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -202,29 +218,97 @@ public class UsersDB {
         }
     }
 
-    //Check if a Email exists in the database if so return 0 or 1 
+    /**
+     * Checks if a user with the given email exists in the database.
+     */
     public boolean checkStatus(String email) {
-    String sql = "SELECT COUNT(*) FROM USERS WHERE email = ?";
-    // keep your one Connection open
-    Connection conn = manager.getConnection();
-    try (
-        // only auto-close the PreparedStatement and ResultSet
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        // 1️⃣ bind BEFORE you run the query
-        ps.setString(1, email);
+        String sql = "SELECT COUNT(*) FROM USERS WHERE email = ?";
+        try (Connection conn = manager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "Error checking user status", ex);
+        }
+        return false;
+    }
+        
+//    public boolean getCardBalance(String email) {
+//        String sql = "SELECT topUp FROM USERS WHERE email = ?";
+//        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setString(1, userEmail);
+//            try (ResultSet rs = ps.executeQuery()) {
+//                if (rs.next()) {
+//                    double balance = rs.getDouble("topUp");
+//                    // … use balance …
+//                }
+//            }
+//        }}
 
-        // 2️⃣ now execute and grab the one-row resultset
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                // 3️⃣ true if there's at least one match
-                return rs.getInt(1) > 0;
+    /**
+     * Update only the user's email.
+     * This will also update the email in all of the user's bookings.
+     */
+    public boolean updateUserEmail(String oldEmail, String newEmail) {
+        String updateUserSQL = "UPDATE USERS SET email = ? WHERE email = ?";
+        String updateBookingsSQL = "UPDATE BOOKINGS SET email = ? WHERE email = ?";
+        Connection conn = null;
+        try {
+            conn = manager.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            try (PreparedStatement psUser = conn.prepareStatement(updateUserSQL)) {
+                psUser.setString(1, newEmail);
+                psUser.setString(2, oldEmail);
+                psUser.executeUpdate();
+            }
+
+            try (PreparedStatement psBooking = conn.prepareStatement(updateBookingsSQL)) {
+                psBooking.setString(1, newEmail);
+                psBooking.setString(2, oldEmail);
+                psBooking.executeUpdate();
+            }
+
+            conn.commit(); // Commit transaction
+            return true;
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "Error updating user email", ex);
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback on error
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Error rolling back transaction", e);
+                }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Error closing connection", e);
+                }
             }
         }
-    } catch (SQLException ex) {
-        logger.log(Level.SEVERE, "Error checking user status", ex);
     }
-    // no matches or an error
-    return false;
-}
+
+    /**
+     * Update only the user's password.
+     */
+    public boolean updateUserPassword(String email, String newPassword) {
+        String sql = "UPDATE USERS SET password = ? WHERE email = ?";
+        try (Connection conn = manager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
+            ps.setString(2, email);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "Error updating user password", ex);
+            return false;
+        }
+    }
 }

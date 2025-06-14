@@ -8,13 +8,14 @@ import java.sql.*;
 
 /**
  *
- * @author scara
+ * @author Dipendra
  */
 public class LaunchWindow extends javax.swing.JFrame {
 
     /**
      * Creates new form LaunchWindow
      */
+    // creates a new launch window and connects to the database
     public LaunchWindow() {
            try {
             DBManager manager = new DBManager();
@@ -157,12 +158,13 @@ public class LaunchWindow extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void username_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_username_fieldActionPerformed
+    private void username_fieldActionPerformed(java.awt.event.ActionEvent evt) {
 
 
-    }//GEN-LAST:event_username_fieldActionPerformed
+    }
 
-    private void login_button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_login_button1ActionPerformed
+    // handles the login button click
+    private void login_button1ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
            String name = username_field.getText().trim();
            String password = new String(password_field.getPassword()).trim();
@@ -210,26 +212,29 @@ public class LaunchWindow extends javax.swing.JFrame {
 //        } else {
 //            JOptionPane.showMessageDialog(this, "Incorrect credentials");
 //        }
-    }//GEN-LAST:event_login_button1ActionPerformed
+    }
 
-    private void register_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_register_buttonActionPerformed
+    // handles the register button click
+    private void register_buttonActionPerformed(java.awt.event.ActionEvent evt) {
 
         Register register_window = new Register();
         register_window.setVisible(true);
-    }//GEN-LAST:event_register_buttonActionPerformed
+    }
 
-    private void password_checkboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_password_checkboxActionPerformed
+    // handles the show password checkbox
+    private void password_checkboxActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         if (password_checkbox.isSelected()) {
             password_field.setEchoChar((char) 0);
         } else {
             password_field.setEchoChar('*');
         }
-    }//GEN-LAST:event_password_checkboxActionPerformed
+    }
 
     /**
      * @param args the command line arguments
      */
+    // main method to run the launch window
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

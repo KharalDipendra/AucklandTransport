@@ -9,10 +9,12 @@ package User;
 public class Session {
     private static User currUser;
     
+    // sets the current user for the session
     public static void setCurrentUser(User user) {
         currUser = user;
     }
     
+    // gets the current user for the session
     public static User getCurrentUser() {
         return currUser;
     }

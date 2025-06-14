@@ -48,66 +48,76 @@ public class Booking {
         this.PRICE = 0.0;
     }
     
+    // gets the price of the booking
     public double getPrice() {
         return this.PRICE;
     }
     
+    // sets the price of the booking
     public double setPrice(double new_price) {
         return this.PRICE = new_price;
     }
     
+    // gets the destination of the booking
     public String getWhereTo() {
         return this.where;
     }
     
+    // sets the destination of the booking
     public String setWhereTo(String new_where) {
         //NORTH,EAST,SOUTH,WEST
         return this.where = new_where;
     }
-    // --- bookingId ---
+    // gets the booking id
     public int getBookingId() {
         return bookingId;
     }
+    // sets the booking id
     public void setBookingId(int bookingId) {
         this.bookingId = bookingId;
     }
 
-    // --- name ---
+    // gets the name of the user who made the booking
     public String getName() {
         return name;
     }
+    // sets the name of the user who made the booking
     public void setName(String name) {
         this.name = name;
     }
 
-    // --- email ---
+    // gets the email of the user who made the booking
     public String getEmail() {
         return email;
     }
+    // sets the email of the user who made the booking
     public void setEmail(String email) {
         this.email = email;
     }
 
-    // --- dateBooked ---
+    // gets the date the booking was made
     public LocalDate getDateBooked() {
         return dateBooked;
     }
+    // sets the date the booking was made
     public void setDateBooked(LocalDate dateBooked) {
         this.dateBooked = dateBooked;
     }
 
-    // --- departureDate ---
+    // gets the departure date of the booking
     public LocalDate getDepartureDate() {
         return departureDate;
     }
+    // sets the departure date of the booking
     public void setDepartureDate(LocalDate departureDate) {
         this.departureDate = departureDate;
     }
 
-    // --- serviceType ---
+    // gets the service type of the booking
     public String getServiceType() {
         return serviceType;
     }
+    // sets the service type of the booking
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
     }

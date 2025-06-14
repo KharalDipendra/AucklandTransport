@@ -21,30 +21,20 @@ public final class Tables {
         "discountType VARCHAR(20) DEFAULT 'Standard'" +
         ")";
     
- private static final String CREATE_BOOKINGS_TABLE =
-    "CREATE TABLE BOOKINGS (" +
-      "bookingId     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-      "username      VARCHAR(100) NOT NULL,               " + 
-      "email         VARCHAR(150) NOT NULL,               " +
-      "dateBooked    DATE NOT NULL,                       " +
-      "departureDate DATE NOT NULL,                       " +
-      "destination   VARCHAR(10) NOT NULL,               " + 
-      "price DECIMAL(10,2), " +
-      "serviceType   VARCHAR(50)  NOT NULL,               " + 
-      "FOREIGN KEY (email) REFERENCES USERS(email)        " +
-    ")";
-
-    
-    private static final String CREATE_DISCOUNT_REQUESTS_TABLE =
-        "CREATE TABLE DISCOUNT_REQUESTS (" +
-        "userName VARCHAR(100) PRIMARY KEY, " +
-        "requestedType VARCHAR(20) NOT NULL, " +
-        "approved BOOLEAN" +
+    private static final String CREATE_BOOKINGS_TABLE =
+        "CREATE TABLE BOOKINGS (" +
+          "bookingId     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+          "username      VARCHAR(100) NOT NULL,               " + 
+          "email         VARCHAR(150) NOT NULL,               " +
+          "dateBooked    DATE NOT NULL,                       " +
+          "departureDate DATE NOT NULL,                       " +
+          "destination   VARCHAR(100) NOT NULL,               " + 
+          "price DECIMAL(10,2), " +
+          "serviceType   VARCHAR(50)  NOT NULL,               " + 
+          "FOREIGN KEY (email) REFERENCES USERS(email)        " +
         ")";
     
-    /**
-     * Drops a table if it exists by name; ignores errors if absent.
-     */
+    // drops a table if it exists
     private static void dropIfExists(DBManager manager, String tableName) {
         try {
             manager.executeUpdate("DROP TABLE " + tableName);
@@ -54,24 +44,19 @@ public final class Tables {
         }
     }
     
-    /**
-     * Drops all application tables (in correct order) and recreates them.
-     */
+    // makes the database tables
     public static void makeTable(DBManager manager) {
-        // Drop order to satisfy FK constraints
-        dropIfExists(manager, "DISCOUNT_REQUESTS");
         dropIfExists(manager, "BOOKINGS");
         dropIfExists(manager, "USERS");
         
         // Create tables in dependency order
         manager.executeUpdate(CREATE_USERS_TABLE);
         manager.executeUpdate(CREATE_BOOKINGS_TABLE);
-        manager.executeUpdate(CREATE_DISCOUNT_REQUESTS_TABLE);
         
         System.out.println("All tables initialized");
     }
     
-    // CALL THIS NEVER CALL makeTABLE by itself
+    // shows a confirmation window before making tables
     public static void createWindow() {
       new ConfirmDB().setVisible(true);
     }

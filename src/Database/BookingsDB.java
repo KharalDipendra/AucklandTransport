@@ -17,6 +17,7 @@ public class BookingsDB {
 
     private final DBManager manager;
 
+    // uses a shared database manager
     public BookingsDB(DBManager manager) {
         this.manager = manager;
     }
@@ -25,11 +26,11 @@ public class BookingsDB {
      * Inserts a new booking and returns the generated bookingId.
      */
     public int addBooking(
-            String username, // Changed from 'name' to match database
+            String username,
             String email,
             LocalDate dateBooked,
             LocalDate departureDate,
-            String destination, // Added destination parameter
+            String destination,
             Double price,
             String serviceType
     ) throws SQLException {
@@ -41,11 +42,11 @@ public class BookingsDB {
                 new String[]{"BOOKINGID"}
         )) {
 
-            ps.setString(1, username);  // Match database column name
+            ps.setString(1, username);
             ps.setString(2, email);
             ps.setDate(3, Date.valueOf(dateBooked));
             ps.setDate(4, Date.valueOf(departureDate));
-            ps.setString(5, destination);  // Add destination
+            ps.setString(5, destination);
             ps.setDouble(6, price);
             ps.setString(7, serviceType);
 
@@ -95,17 +96,41 @@ public class BookingsDB {
         return list;
     }
     
-    
-    //Removing a booking
-     
-   public boolean deleteBooking(int bookingId) throws SQLException {
-    String sql = "DELETE FROM BOOKINGS WHERE bookingId = ?";
-    try (Connection conn = manager.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, bookingId);
-        return ps.executeUpdate() > 0;
+    // removes a booking from the database
+    public boolean deleteBooking(int bookingId) throws SQLException {
+        String sql = "DELETE FROM BOOKINGS WHERE bookingId = ?";
+        try (Connection conn = manager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            return ps.executeUpdate() > 0;
+        }
     }
-}
+
+    // gets a booking by its id
+    public Booking getBookingById(int bookingId) throws SQLException {
+        String sql = "SELECT bookingId, username, email, dateBooked, departureDate, destination, price, serviceType "
+                + "FROM BOOKINGS WHERE bookingId = ?";
+    
+        try (Connection conn = manager.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Booking b = new Booking();
+                    b.setBookingId(rs.getInt("bookingId"));
+                    b.setName(rs.getString("username"));
+                    b.setEmail(rs.getString("email"));
+                    b.setDateBooked(rs.getDate("dateBooked").toLocalDate());
+                    b.setDepartureDate(rs.getDate("departureDate").toLocalDate());
+                    b.setWhereTo(rs.getString("destination"));
+                    b.setPrice(rs.getDouble("price"));
+                    b.setServiceType(rs.getString("serviceType"));
+                    return b;
+                }
+            }
+        }
+        return null; // or throw an exception if booking not found
+    }
 
     // TODO: add updateBooking/removeBooking methods as needed
 }

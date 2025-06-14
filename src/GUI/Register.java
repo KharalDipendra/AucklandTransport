@@ -23,11 +23,13 @@ public class Register extends javax.swing.JFrame {
     //User class to store users
     private User userDB;
 
+    // creates a new register window and connects to the database
     public Register() {
         initComponents();
         makeConnection();
     }
 
+    // makes a connection to the database
     public void makeConnection() {
         try {
             DBManager manager = new DBManager();
@@ -158,6 +160,7 @@ public class Register extends javax.swing.JFrame {
 
     }//GEN-LAST:event_username_fieldActionPerformed
 
+    // handles the register button click
     private void register_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_register_buttonActionPerformed
         String username = username_field.getText().trim();
         String email = email_field.getText().trim();
@@ -204,6 +207,7 @@ public class Register extends javax.swing.JFrame {
 
     }//GEN-LAST:event_register_buttonActionPerformed
 
+    // handles the show password checkbox
     private void password_checkboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_password_checkboxActionPerformed
         // TODO add your handling code here:
         if (password_checkbox.isSelected()) {
@@ -216,6 +220,7 @@ public class Register extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
+    // main method to run the register window
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

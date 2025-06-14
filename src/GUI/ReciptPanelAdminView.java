@@ -8,34 +8,42 @@ import java.util.List;
  *
  * @author Dipendra
  */
-public class ReciptPanel extends javax.swing.JFrame {
+public class ReciptPanelAdminView extends javax.swing.JFrame {
 
     /**
      * Creates new form ReciptPanel
      */
-    public ReciptPanel() {
+    public ReciptPanelAdminView() {
 
         initComponents();
     }
 
-   public void displayBooking(Booking b) {
-        String receipt =
-            "Booking Receipt\n" +
-            "---------------\n" +
-            "ID            : " + b.getBookingId()          + "\n" +
-            "Name          : " + b.getName()               + "\n" +
-            "Email         : " + b.getEmail()              + "\n" +
-            "Date Booked   : " + b.getDateBooked()         + "\n" +
-            "Departure Date: " + b.getDepartureDate()      + "\n" +
-            "Destination   : " + b.getWhereTo()            + "\n" +
-            "Service Type  : " + b.getServiceType()        + "\n" +
-            "Price         : $" + String.format("%.2f", b.getPrice()) + "\n" +
-            "---------------\n" +
-            "Thank you for booking with AT HOP!\n" +
-            "Safe travels :)";
-        recipt_info.setEditable(false);
-        recipt_info.setText(receipt);
-    }
+public void displayBooking(Booking b) {
+    String receipt =
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n" +
+        "                  BOOKING MANAGEMENT SYSTEM               \n" +
+        "                      ADMIN DASHBOARD                     \n" +
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n\n" +
+        "📋 BOOKING DETAILS\n" +
+        "   ├─ ID: #" + b.getBookingId() + "\n" +
+        "   ├─ Status: CONFIRMED ✅\n" +
+        "   └─ Type: " + b.getServiceType() + "\n\n" +
+        "👤 CUSTOMER INFO\n" +
+        "   ├─ Name: " + b.getName() + "\n" +
+        "   └─ Email: " + b.getEmail() + "\n\n" +
+        "📅 SCHEDULE\n" +
+        "   ├─ Booked On: " + b.getDateBooked() + "\n" +
+        "   ├─ Departure: " + b.getDepartureDate() + "\n" +
+        "   └─ Destination: " + b.getWhereTo() + "\n\n" +
+        "💰 FINANCIAL\n" +
+        "   └─ Total Amount: $" + String.format("%.2f", b.getPrice()) + "\n\n" +
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n" +
+        " 🔒 ADMIN ACCESS ONLY                  \n" +
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
+    
+    recipt_info.setEditable(false);
+    recipt_info.setText(receipt);
+}
 
 
 
@@ -57,7 +65,7 @@ public class ReciptPanel extends javax.swing.JFrame {
         username_label2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Auckland_Transport_Logo_optimized.png"))); // NOI18N
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Your Receipt");
+        jLabel1.setText("Admin View");
 
         recipt_info.setColumns(20);
         recipt_info.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
@@ -75,11 +83,11 @@ public class ReciptPanel extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(reciptInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                    .addComponent(reciptInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 740, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(username_label2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -93,7 +101,7 @@ public class ReciptPanel extends javax.swing.JFrame {
                         .addComponent(jLabel1)
                         .addGap(11, 11, 11)))
                 .addGap(26, 26, 26)
-                .addComponent(reciptInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+                .addComponent(reciptInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -117,20 +125,21 @@ public class ReciptPanel extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ReciptPanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReciptPanelAdminView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ReciptPanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReciptPanelAdminView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ReciptPanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReciptPanelAdminView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ReciptPanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReciptPanelAdminView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ReciptPanel().setVisible(true);
+                new ReciptPanelAdminView().setVisible(true);
             }
         });
     }

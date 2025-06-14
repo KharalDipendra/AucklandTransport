@@ -3,6 +3,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * DBManager handles the core database connection and SQL execution.
@@ -16,17 +18,12 @@ public class DBManager {
     private Connection conn;
     private Statement stmt;
     
-    /**
-     * Initialize and open the database connection.
-     */
+    // opens the database connection
     public DBManager() {
         establishConnection();
     }
     
-    /**
-     * Establishes the JDBC connection and creates a Statement.
-     * Throws a RuntimeException on failure to avoid silent errors.
-     */
+    // sets up the jdbc connection
     private void establishConnection() {
         if (conn != null) {
             try {
@@ -61,10 +58,7 @@ public class DBManager {
         return conn;
     }
     
-    /**
-     * Executes a SQL update/DDL statement.
-     * @param sql the SQL string (e.g. CREATE, INSERT, UPDATE, ALTER)
-     */
+    // runs a sql update
     public void executeUpdate(String sql) {
         try {
             if (conn == null || conn.isClosed()) {
@@ -79,9 +73,7 @@ public class DBManager {
         }
     }
     
-    /**
-     * Closes the Statement and Connection. Safe to call multiple times.
-     */
+    // closes the statement and connection
     public void close() {
         if (stmt != null) {
             try {
@@ -99,6 +91,17 @@ public class DBManager {
                 System.err.println("Error closing Connection: " + e.getMessage());
             } finally {
                 conn = null;
+            }
+        }
+    }
+
+    // closes the database connections
+    public void closeConnections() {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

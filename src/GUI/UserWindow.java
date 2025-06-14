@@ -5,37 +5,37 @@ import Database.DBManager;
 import Database.UsersDB;
 import User.*;
 import card.cardManager;
-
-import java.awt.GridLayout;
-import java.security.interfaces.RSAKey;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import org.apache.derby.iapi.sql.PreparedStatement;
-import org.apache.derby.iapi.sql.ResultSet;
-import org.apache.derby.impl.sql.execute.CurrentDatetime;
-
 /**
- * @author scara
+ * @author Dipendra
  */
+
 public class UserWindow extends javax.swing.JFrame {
+
+    private final DBManager dbManager;
+    private final UsersDB usersDB;
+    private final BookingsDB bookingsDB;
 
     /**
      * Creates new form UserWindow
      */
     public UserWindow() {
+        this.dbManager = new DBManager();
+        this.usersDB = new UsersDB(dbManager);
+        this.bookingsDB = new BookingsDB(dbManager);
+
         initComponents();
         updateTable();
         User u = Session.getCurrentUser();
@@ -43,17 +43,16 @@ public class UserWindow extends javax.swing.JFrame {
 
         if (hasCard) {
             cardNM.setText(u.getCardNumber());
-            balance.setText(Double.toString(u.getBalance()));
+            card_bal.setText(Double.toString(u.getBalance()));
         } else {
             cardNM.setText("Generate card first");
-            balance.setText(Double.toString(u.getBalance()));
-
+            card_bal.setText(Double.toString(u.getBalance()));
         }
 
         refreshCardUI();
-
     }
 
+    // shows a booking confirmation message
     private void showBookingConfirmation(User current,
             LocalDate dateBooked,
             LocalDate departureDate,
@@ -79,35 +78,24 @@ public class UserWindow extends javax.swing.JFrame {
         fare_booking_info.setText(receipt);
     }
 
+    // updates the bookings table
     private void updateTable() {
-        String sql = "SELECT bookingId, username, email, dateBooked, departureDate, Destination,Price, serviceType "
-                + "FROM BOOKINGS WHERE email = ? ORDER BY departureDate";
-
         try {
-            DBManager conn = new DBManager();
-            conn.getConnection();
-
             User current = Session.getCurrentUser();
+            if (current == null) return; // Should not happen if window is open
 
             DefaultTableModel model = (DefaultTableModel) booking_table.getModel();
-
-            BookingsDB booking = new BookingsDB(conn);
-
-            List<Booking> bookingInfo = booking.getBookingsForUser(current.getEmail());
-            model.setRowCount(0);
+            List<Booking> bookingInfo = this.bookingsDB.getBookingsForUser(current.getEmail());
+            
+            model.setRowCount(0); // Clear table
 
             for (Booking books : bookingInfo) {
                 model.addRow(new Object[]{
                     books.getBookingId(),
                     books.getName(),
-                    books.getEmail(),
                     books.getDateBooked(),
                     books.getDepartureDate(),
-                    books.getWhereTo(),
-                    books.getServiceType(),
-                    books.getPrice()
-
-                });
+                    books.getServiceType(),});
             }
 
         } catch (Exception ex) {
@@ -115,13 +103,13 @@ public class UserWindow extends javax.swing.JFrame {
         }
     }
 
+    // refreshes the card ui elements
     private void refreshCardUI() {
         User currentUser = Session.getCurrentUser();
         String cardNo = currentUser != null ? currentUser.getCardNumber() : null;
         boolean hasCard = cardNo != null && !cardNo.isEmpty();
 
         if (hasCard) {
-            // User has a card - show card number, hide button and no-card message
             cardNM.setText(cardNo);
             cardNM.setVisible(true);
             generate_card.setVisible(false);
@@ -130,7 +118,7 @@ public class UserWindow extends javax.swing.JFrame {
             // User doesn't have a card - show button and no-card message, hide card number
             generate_card.setVisible(true);
             no_card_txt.setVisible(true);
-            cardNM.setVisible(false); // or set empty text: cardNM.setText("");
+            cardNM.setVisible(false); 
         }
     }
 
@@ -144,6 +132,8 @@ public class UserWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         username_label2 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
+        LOGOUT1 = new javax.swing.JButton();
         whoami = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -160,30 +150,15 @@ public class UserWindow extends javax.swing.JFrame {
         discount_type = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         card_number = new javax.swing.JLabel();
         card_balance = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        cardNM = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        balance = new javax.swing.JLabel();
-        generate_card = new javax.swing.JToggleButton();
-        no_card_txt = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        amount_topup = new javax.swing.JTextField();
-        jLabel24 = new javax.swing.JLabel();
-        topup_button = new javax.swing.JButton();
-        jLabel25 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jLabel27 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jSeparator1 = new javax.swing.JSeparator();
+        Options = new javax.swing.JLabel();
+        passwordChange = new javax.swing.JButton();
+        emailChange = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         ferry_type = new javax.swing.JComboBox<>();
@@ -199,6 +174,8 @@ public class UserWindow extends javax.swing.JFrame {
         pay_button = new javax.swing.JButton();
         jLabel29 = new javax.swing.JLabel();
         location = new javax.swing.JComboBox<>();
+        aucklandLocations = new javax.swing.JComboBox<>();
+        jLabel30 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         booking_table = new javax.swing.JTable();
@@ -207,9 +184,30 @@ public class UserWindow extends javax.swing.JFrame {
         delete_table = new javax.swing.JButton();
         edit_booking1 = new javax.swing.JToggleButton();
         jPanel1 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        cardNM = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        card_bal = new javax.swing.JLabel();
+        generate_card = new javax.swing.JToggleButton();
+        no_card_txt = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        amount_topup = new javax.swing.JTextField();
+        topup_button = new javax.swing.JButton();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        LOGOUT = new javax.swing.JButton();
 
         username_label2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Auckland_Transport_Logo_optimized.png"))); // NOI18N
+
+        jButton4.setText("Change Email");
+
+        LOGOUT1.setText("LOGOUT");
+        LOGOUT1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LOGOUT1ActionPerformed(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -227,6 +225,8 @@ public class UserWindow extends javax.swing.JFrame {
         });
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Auckland_Transport_Logo_optimized.png"))); // NOI18N
+
+        jPanel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         jLabel11.setText("Username:");
         jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -272,8 +272,6 @@ public class UserWindow extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(51, 102, 255));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/LongDistance.png"))); // NOI18N
-
         card_number.setText("Card Number:");
         card_number.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
@@ -288,9 +286,26 @@ public class UserWindow extends javax.swing.JFrame {
 
         jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/new-zealand-kiwi-bird-clipart.png"))); // NOI18N
 
-        jLabel5.setText("Select tabs above to access more features");
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(204, 0, 51));
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator1.setForeground(new java.awt.Color(153, 153, 153));
+
+        Options.setText("Profile Options");
+        Options.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        Options.setForeground(new java.awt.Color(51, 102, 255));
+
+        passwordChange.setText("Change Password");
+        passwordChange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordChangeActionPerformed(evt);
+            }
+        });
+
+        emailChange.setText("Change email");
+        emailChange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailChangeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -299,46 +314,58 @@ public class UserWindow extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(143, 143, 143)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel11)
-                                    .addComponent(jLabel12)
-                                    .addComponent(jLabel13)
-                                    .addComponent(jLabel16)
-                                    .addComponent(jLabel14)
-                                    .addComponent(jLabel19)
-                                    .addComponent(jLabel20))
-                                .addGap(28, 28, 28)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(card_balance)
-                                    .addComponent(role_placeholder)
-                                    .addComponent(email_placeholder)
-                                    .addComponent(acc_made)
-                                    .addComponent(discount_type)
-                                    .addComponent(name_placeholder)
-                                    .addComponent(card_number))))
-                        .addContainerGap(81, Short.MAX_VALUE))
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel16)
+                            .addComponent(jLabel14)
+                            .addComponent(jLabel19)
+                            .addComponent(jLabel20))
+                        .addGap(28, 28, 28)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(card_balance)
+                            .addComponent(role_placeholder)
+                            .addComponent(email_placeholder)
+                            .addComponent(acc_made)
+                            .addComponent(discount_type)
+                            .addComponent(name_placeholder)
+                            .addComponent(card_number)))
+                    .addComponent(jLabel3)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel15)
-                        .addGap(53, 53, 53))))
+                        .addGap(47, 47, 47)))
+                .addGap(98, 98, 98)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(36, 36, 36)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Options)
+                    .addComponent(passwordChange, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(emailChange, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 418, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addComponent(jLabel3)
+                .addGap(27, 27, 27)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(Options)
+                                .addGap(28, 28, 28)
+                                .addComponent(emailChange, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(passwordChange, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(116, 116, 116))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(165, 165, 165)
+                                .addComponent(jLabel20))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel11)
@@ -364,170 +391,13 @@ public class UserWindow extends javax.swing.JFrame {
                                     .addComponent(card_number)
                                     .addComponent(jLabel19))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(card_balance))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(165, 165, 165)
-                                .addComponent(jLabel20)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                                .addComponent(card_balance)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
                         .addComponent(jLabel15)
-                        .addGap(69, 69, 69))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
-                        .addComponent(jLabel5)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(50, 50, 50))))
         );
 
         user_info_tab.addTab("User Information", jPanel2);
-
-        cardNM.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        jLabel21.setText("Card Number:");
-        jLabel21.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        jLabel22.setText("Card Balance: ");
-        jLabel22.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        balance.setText("money");
-        balance.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        generate_card.setText("Click to generate");
-        generate_card.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        generate_card.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                generate_cardActionPerformed(evt);
-            }
-        });
-
-        no_card_txt.setText("It looks like you cont have a card click button to generate");
-
-        jLabel6.setText("General Information");
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(51, 102, 255));
-
-        jLabel10.setText("Discount");
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(51, 102, 255));
-
-        amount_topup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                amount_topupActionPerformed(evt);
-            }
-        });
-        amount_topup.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                amount_topupKeyTyped(evt);
-            }
-        });
-
-        jLabel24.setText("Standard NO DISCOUNT");
-        jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        topup_button.setText("Confirm and pay");
-        topup_button.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                topup_buttonActionPerformed(evt);
-            }
-        });
-
-        jLabel25.setText("Top up");
-        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel25.setForeground(new java.awt.Color(51, 102, 255));
-
-        jLabel26.setText("Enter Amount:");
-        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        jButton2.setText("Apply for discount");
-
-        jLabel27.setText("Click one of options to apply the support team will have a look at it");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Student", "Gold Card" }));
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel21)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cardNM))
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel22)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(balance))
-                            .addComponent(jLabel6))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 311, Short.MAX_VALUE)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(no_card_txt)
-                                .addGap(27, 27, 27))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(generate_card, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(97, 97, 97))))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(topup_button, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel27)
-                                .addComponent(jLabel25)
-                                .addComponent(jLabel24)
-                                .addComponent(jLabel10)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(amount_topup, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel26, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addGap(0, 0, Short.MAX_VALUE))))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cardNM)
-                            .addComponent(jLabel21))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel22)
-                            .addComponent(balance)))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(no_card_txt)
-                        .addGap(18, 18, 18)
-                        .addComponent(generate_card, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(41, 41, 41)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel24)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel27)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel25)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel26)
-                .addGap(18, 18, 18)
-                .addComponent(amount_topup, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(topup_button, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(131, Short.MAX_VALUE))
-        );
-
-        user_info_tab.addTab("Card", jPanel4);
 
         jLabel9.setText("Booking Type");
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -546,7 +416,7 @@ public class UserWindow extends javax.swing.JFrame {
         jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         fare_price.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        fare_price.setText("20");
+        fare_price.setText("0");
         fare_price.addAncestorListener(new javax.swing.event.AncestorListener() {
             public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
                 fare_priceAncestorAdded(evt);
@@ -584,7 +454,7 @@ public class UserWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel29.setText("Location in auckland");
+        jLabel29.setText("Route");
         jLabel29.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         location.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "North", "East", "South", "West" }));
@@ -594,20 +464,51 @@ public class UserWindow extends javax.swing.JFrame {
             }
         });
 
+        aucklandLocations.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "select location" }));
+        aucklandLocations.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aucklandLocationsActionPerformed(evt);
+            }
+        });
+
+        jLabel30.setText("Location in auckland");
+        jLabel30.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 948, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel17)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(calender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(102, 102, 102)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(153, 153, 153)
+                                        .addComponent(jLabel18))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(pay_button, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(63, 63, 63))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -615,23 +516,13 @@ public class UserWindow extends javax.swing.JFrame {
                                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(location, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(102, 102, 102)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(153, 153, 153)
-                                .addComponent(jLabel18))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(pay_button, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel17)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                                    .addComponent(location, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(aucklandLocations, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel30, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -640,33 +531,35 @@ public class UserWindow extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel17)
                     .addComponent(jLabel9)
-                    .addComponent(jLabel29))
+                    .addComponent(jLabel29)
+                    .addComponent(jLabel30))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(15, 15, 15)
+                        .addComponent(calender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(ferry_type, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(location, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(location, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(aucklandLocations, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel18)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(pay_button, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(calender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pay_button, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addGap(17, 17, 17))))
         );
 
         user_info_tab.addTab("Book a fare", jPanel3);
@@ -679,14 +572,14 @@ public class UserWindow extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Date booked", "Departure Date", "Service type"
+                "ID", "Name", "Booking Date", "Departing date", "Type"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -739,21 +632,21 @@ public class UserWindow extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)
-                .addGap(37, 37, 37)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 891, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel23)
                     .addComponent(update_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(edit_booking1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(delete_table, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(33, 33, 33))
+                .addGap(9, 9, 9))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(44, 44, 44)
                         .addComponent(jLabel23)
                         .addGap(18, 18, 18)
                         .addComponent(update_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -762,31 +655,150 @@ public class UserWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(delete_table, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
         user_info_tab.addTab("My Bookings", jPanel5);
 
-        jLabel7.setText(" © Auckland Transport 2025 ");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel7)
-                .addGap(0, 669, Short.MAX_VALUE))
+            .addGap(0, 1066, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(546, Short.MAX_VALUE)
-                .addComponent(jLabel7)
-                .addContainerGap())
+            .addGap(0, 568, Short.MAX_VALUE)
         );
 
-        user_info_tab.addTab("Settings", jPanel1);
+        user_info_tab.addTab("", jPanel1);
+
+        cardNM.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        jLabel21.setText("Card Number:");
+        jLabel21.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        jLabel22.setText("Card Balance: ");
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        card_bal.setText("money");
+        card_bal.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        generate_card.setText("Click to generate");
+        generate_card.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        generate_card.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generate_cardActionPerformed(evt);
+            }
+        });
+
+        no_card_txt.setText("It looks like you cont have a card click button to generate you wont be able to make bookings without one");
+        no_card_txt.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        no_card_txt.setForeground(new java.awt.Color(255, 0, 51));
+
+        jLabel6.setText("General Information");
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(51, 102, 255));
+
+        amount_topup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amount_topupActionPerformed(evt);
+            }
+        });
+        amount_topup.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                amount_topupKeyTyped(evt);
+            }
+        });
+
+        topup_button.setText("Confirm and pay");
+        topup_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                topup_buttonActionPerformed(evt);
+            }
+        });
+
+        jLabel25.setText("Top up");
+        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(51, 102, 255));
+
+        jLabel26.setText("Enter Amount:");
+        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(topup_button, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(amount_topup, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel26, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 165, Short.MAX_VALUE)
+                        .addComponent(no_card_txt)
+                        .addGap(26, 26, 26))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel21)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cardNM))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel22)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(card_bal))
+                            .addComponent(jLabel25))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(generate_card, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(260, 260, 260))))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(46, 46, 46)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(no_card_txt))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cardNM)
+                            .addComponent(jLabel21))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel22)
+                            .addComponent(card_bal))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel25))
+                    .addComponent(generate_card, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel26)
+                .addGap(18, 18, 18)
+                .addComponent(amount_topup, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(topup_button, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(269, Short.MAX_VALUE))
+        );
+
+        user_info_tab.addTab("Card", jPanel4);
+
+        LOGOUT.setText("LOGOUT");
+        LOGOUT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LOGOUTActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -796,29 +808,34 @@ public class UserWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(user_info_tab)
+                        .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2))
+                        .addComponent(user_info_tab)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
                         .addComponent(whoami, javax.swing.GroupLayout.PREFERRED_SIZE, 348, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(LOGOUT, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(whoami, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)))
+                        .addGap(33, 33, 33))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(LOGOUT, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(317, 317, 317)
                         .addComponent(jLabel2)
                         .addGap(292, 292, 292))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -836,148 +853,98 @@ public class UserWindow extends javax.swing.JFrame {
         whoami.setText("Welcome back " + current_user.getName());
     }//GEN-LAST:event_whoamiAncestorAdded
 
-    private void name_placeholderAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_name_placeholderAncestorAdded
-        // TODO add your handling code here:
-        User username = Session.getCurrentUser();
-        name_placeholder.setText(username.getName());
-        email_placeholder.setText(username.getEmail());
-
-        Date legacyDate = Date.valueOf(username.getMemberSince());
-
-        SimpleDateFormat formatted_date = new SimpleDateFormat("yyyy-MM-dd");
-        String s = formatted_date.format(legacyDate);
-        acc_made.setText(s);
-        discount_type.setText(username.getDiscountType());
-
-        if (username.getCardNumber() == null) {
-            card_number.setText("No card registered yet");
+    // handles the email change button click
+    private void emailChangeActionPerformed(java.awt.event.ActionEvent evt) {
+        String newEmailStr = JOptionPane.showInputDialog(this, "Enter new email:");
+        if (newEmailStr == null || newEmailStr.trim().isEmpty()) {
+            return; // User cancelled or entered empty string
+        }
+        
+        // Validate email format
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        if (!newEmailStr.matches(emailRegex)) {
+            JOptionPane.showMessageDialog(this, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        User current = Session.getCurrentUser();
+        if (this.usersDB.updateUserEmail(current.getEmail(), newEmailStr)) {
+            JOptionPane.showMessageDialog(this, "Email updated successfully.");
+            current.setEmail(newEmailStr); // Update session object
+            email_placeholder.setText(newEmailStr); // Update UI
         } else {
-            card_number.setText(username.getCardNumber());
+            JOptionPane.showMessageDialog(this, "Failed to update email.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
 
-        card_balance.setText(Double.toString(username.getBalance()));
-
-        repaint();
-        revalidate();
-
-    }//GEN-LAST:event_name_placeholderAncestorAdded
-
-    private void generate_cardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generate_cardActionPerformed
-        // TODO add your handling code here:
-        User currentUser = Session.getCurrentUser();
-        cardManager cardMgr = new cardManager(new DBManager());
-        try {
-            String newCard = cardMgr.issueCard(currentUser);
-            // inform the user
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Your new card number is: " + newCard,
-                    "Card Issued",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            // update the UI label
-            cardNM.setText(currentUser.getCardNumber());
-            refreshCardUI();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to issue card:\n" + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        } catch (Exception ex) {
-            Logger.getLogger(UserWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }//GEN-LAST:event_generate_cardActionPerformed
-
-    private void ferry_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ferry_typeActionPerformed
-        // TODO add your handling code here:
-//        ferry_type.addItem("Bus");
-//        ferry_type.addItem("Train");
-//        ferry_type.addItem("Boat");
-    }//GEN-LAST:event_ferry_typeActionPerformed
-
-    private void fare_priceAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_fare_priceAncestorAdded
-        // TODO add your handling code here:
-        fare_price.setEditable(false);
-    }//GEN-LAST:event_fare_priceAncestorAdded
-
-    private void fare_booking_infoAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_fare_booking_infoAncestorAdded
-        // TODO add your handling code here:
-        fare_booking_info.setEditable(false);
-    }//GEN-LAST:event_fare_booking_infoAncestorAdded
-
-    private void name_placeholderAncestorRemoved(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_name_placeholderAncestorRemoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_name_placeholderAncestorRemoved
-
-    private void pay_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pay_buttonActionPerformed
-        // TODO add your handling code here:
-
-        LocalDate departure_date = calender.getSelectedDate();
-        LocalDate current_date = LocalDate.now();
-        
-        if (!departure_date.isAfter(current_date)) {
-            JOptionPane.showMessageDialog(this, "Pick a valid date thats after today");
-            return;
+    // handles the password change button click
+    private void passwordChangeActionPerformed(java.awt.event.ActionEvent evt) {
+        String newPasswordStr = JOptionPane.showInputDialog(this, "Enter new password:");
+        if (newPasswordStr == null || newPasswordStr.trim().isEmpty()) {
+            return; // User cancelled or entered empty string
         }
         
-        //Error if no date is picked otherwise it will give a null exception
-        if (departure_date == null) {
-            JOptionPane.showMessageDialog(this, "Pick a date first");
-            return;
+        User current = Session.getCurrentUser();
+        if (this.usersDB.updateUserPassword(current.getEmail(), newPasswordStr)) {
+            JOptionPane.showMessageDialog(this, "Password updated successfully.");
+            current.setPassword(newPasswordStr); // Update session object
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update password.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
-//        int current_day = calender.getSelectedDate().
-//        if (current_day < (int) departure_date.getMonthValue()) {
-//            JOptionPane.showMessageDialog(this, "Select a valid date");
-//            return;
-//        }
-        
-        String s = departure_date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        
-                
-        System.out.println("Booking info");
-        String type = (String) ferry_type.getSelectedItem();
-        System.out.println("Type: " + type);
-        System.out.println("Date: " + s);
+    }
 
-        //Local date 
-        LocalDate dateBooked = LocalDate.now();
-        String getDestination = (String) location.getSelectedItem();
-        //Get current userInfo
+    // handles the logout button click
+    private void LOGOUTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LOGOUTActionPerformed
+        // logs the user out
+        JOptionPane.showMessageDialog(this, "Logging out...");
+        this.dispose();
+        new LaunchWindow().setVisible(true);
+    }//GEN-LAST:event_LOGOUTActionPerformed
+
+    private void LOGOUT1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LOGOUT1ActionPerformed
+        // logs the user out
+        this.dispose();
+        new LaunchWindow().setVisible(true);
+        
+    }//GEN-LAST:event_LOGOUT1ActionPerformed
+
+    // handles top up button click
+    private void topup_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topup_buttonActionPerformed
+        // TODO add your handling code here:
+
         User current = Session.getCurrentUser();
 
-        Double price = Double.valueOf(fare_price.getText());
-
-        DBManager manager = new DBManager();
-        BookingsDB booking = new BookingsDB(manager);
-        if (current.getCardNumber() == null) {
-            JOptionPane.showMessageDialog(this, "You need a card number to make a booking");
+        if (current == null) {
+            JOptionPane.showMessageDialog(this, "Please log in first.");
             return;
         }
+
+        // 2) Parse the amount from your text field
+        String text = amount_topup.getText().trim();
+        double amt;
         try {
-            int db = booking.addBooking(current.getName(), current.getEmail(), dateBooked, departure_date, getDestination, price, type);
-            System.out.println("Added Booking success");
-            showBookingConfirmation(current, dateBooked, departure_date, getDestination, type, price);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            amt = Double.parseDouble(text);
+            if (amt <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid positive number.");
+            return;
         }
 
-    }//GEN-LAST:event_pay_buttonActionPerformed
+        // 3) Apply the top-up to the in-memory user
+        double newBalance = current.getBalance() + amt;
+        if (newBalance > 1000) {
+            JOptionPane.showMessageDialog(this, "Max money card can have exceeded topup when you're low!");
+            return;
+        }
+        current.setBalance(newBalance);
 
-    private void booking_tableAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_booking_tableAncestorAdded
-        // TODO add your handling code here:
-        booking_table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-    }//GEN-LAST:event_booking_tableAncestorAdded
+        // 4) Persist the new balance to your database
+        this.usersDB.updateUserBalance(current.getEmail(), newBalance);
+        // 5) Update your UI label/textfield
+        card_bal.setText(String.format("%.2f", newBalance));
+    }//GEN-LAST:event_topup_buttonActionPerformed
 
-    private void amount_topupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amount_topupActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_amount_topupActionPerformed
-
+    // validates top up amount input
     private void amount_topupKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_amount_topupKeyTyped
         // TODO add your handling code here:
         char c = evt.getKeyChar();
@@ -986,16 +953,42 @@ public class UserWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_amount_topupKeyTyped
 
-    private void update_bookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_update_bookingActionPerformed
+    private void amount_topupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amount_topupActionPerformed
         // TODO add your handling code here:
-        updateTable();
+    }//GEN-LAST:event_amount_topupActionPerformed
 
-    }//GEN-LAST:event_update_bookingActionPerformed
-
-    private void locationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationActionPerformed
+    // handles generate card button click
+    private void generate_cardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generate_cardActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_locationActionPerformed
+        User currentUser = Session.getCurrentUser();
+        cardManager cardMgr = new cardManager(new DBManager());
+        try {
+            String newCard = cardMgr.issueCard(currentUser);
+            // inform the user
+            JOptionPane.showMessageDialog(
+                this,
+                "Your new card number is: " + newCard,
+                "Card Issued",
+                JOptionPane.INFORMATION_MESSAGE
+            );
 
+            // update the UI label
+            cardNM.setText(currentUser.getCardNumber());
+            refreshCardUI();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                this,
+                "Failed to issue card:\n" + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        } catch (Exception ex) {
+            Logger.getLogger(UserWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_generate_cardActionPerformed
+
+    // handles edit booking button click
     private void edit_booking1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit_booking1ActionPerformed
         // TODO add your handling code here:
         int viewRow = booking_table.getSelectedRow();
@@ -1008,9 +1001,8 @@ public class UserWindow extends javax.swing.JFrame {
 
         int modelRow = booking_table.convertRowIndexToModel(viewRow);
 
-        BookingsDB bookings = new BookingsDB(new DBManager());
         try {
-            List<Booking> bookingInfo = bookings.getBookingsForUser(current.getEmail());
+            List<Booking> bookingInfo = this.bookingsDB.getBookingsForUser(current.getEmail());
             ReciptPanel recipt = new ReciptPanel();
             recipt.setVisible(true);
             recipt.displayBooking(bookingInfo.get(modelRow));
@@ -1020,14 +1012,7 @@ public class UserWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_edit_booking1ActionPerformed
 
-    private void topup_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topup_buttonActionPerformed
-        // TODO add your handling code here:
-        User user = Session.getCurrentUser();
-        user.setBalance(Double.valueOf(amount_topup.getText()));
-        balance.setText(Double.toString(user.getBalance()));
-        repaint();
-    }//GEN-LAST:event_topup_buttonActionPerformed
-
+    // handles delete booking button click
     private void delete_tableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_tableActionPerformed
         // TODO add your handling code here:
         int viewRow = booking_table.getSelectedRow();
@@ -1037,23 +1022,20 @@ public class UserWindow extends javax.swing.JFrame {
         }
         int modelRow = booking_table.convertRowIndexToModel(viewRow);
 
-        Booking toDelete = new Booking();
-
-        BookingsDB userBookings = new BookingsDB(new DBManager());
         User user = Session.getCurrentUser();
         try {
-            List<Booking> bookingData = userBookings.getBookingsForUser(user.getEmail());
+            List<Booking> bookingData = this.bookingsDB.getBookingsForUser(user.getEmail());
             Booking userID = bookingData.get(modelRow);
             int choice = JOptionPane.showConfirmDialog(this,
-                    "Please confirm the deleton of: " + userID.getBookingId() + "?",
-                    "",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+                "Please confirm the deleton of: " + userID.getBookingId() + "?",
+                "",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
             if (choice != JOptionPane.YES_OPTION) {
                 return;
             }
 
-            boolean ok = userBookings.deleteBooking(userID.getBookingId());
+            boolean ok = this.bookingsDB.deleteBooking(userID.getBookingId());
 
             if (ok) {
                 updateTable();
@@ -1068,6 +1050,151 @@ public class UserWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_delete_tableActionPerformed
 
+    private void update_bookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_update_bookingActionPerformed
+        // TODO add your handling code here:
+        updateTable();
+    }//GEN-LAST:event_update_bookingActionPerformed
+
+    private void booking_tableAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_booking_tableAncestorAdded
+        // TODO add your handling code here:
+        booking_table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    }//GEN-LAST:event_booking_tableAncestorAdded
+
+    // handles location dropdown selection
+    private void aucklandLocationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aucklandLocationsActionPerformed
+        String suburb = (String) aucklandLocations.getSelectedItem();
+        if (suburb != null) {
+            Integer dist = Location.DISTANCE_KM.get(suburb);
+            if (dist != null) {
+                double fare = Location.BASE_FARE + Location.RATE_PER_KM * dist;
+                fare = Math.min(fare, Location.MAX_FARE);
+                fare_price.setText(String.format("$%.2f", fare));
+            } else {
+                fare_price.setText("$0.00");
+            }
+        }
+    }//GEN-LAST:event_aucklandLocationsActionPerformed
+
+    private void locationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationActionPerformed
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_locationActionPerformed
+
+    // handles pay button click
+    private void pay_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pay_buttonActionPerformed
+        // TODO add your handling code here:
+        User current = Session.getCurrentUser();
+        if (current == null) {
+            JOptionPane.showMessageDialog(this, "User session not found.");
+            return;
+        }
+
+        if (current.getCardNumber() == null) {
+            JOptionPane.showMessageDialog(this, "Please get a card first from the settings tab");
+            return;
+        }
+        
+        String serviceType = (String) ferry_type.getSelectedItem();
+        String destination = (String) aucklandLocations.getSelectedItem();
+
+        if (serviceType == null || destination == null) {
+            JOptionPane.showMessageDialog(this, "Please select a service type and destination.");
+            return;
+        }
+
+        LocalDate departureDate = calender.getSelectedDate();
+        if (departureDate == null) {
+            JOptionPane.showMessageDialog(this, "Please select a departure date.");
+            return;
+        }
+
+        Integer dist = Location.DISTANCE_KM.get(destination);
+        if (dist == null) {
+            JOptionPane.showMessageDialog(this, "Invalid destination selected.");
+            return;
+        }
+        double price = Location.BASE_FARE + Location.RATE_PER_KM * dist;
+        double finalPrice = Math.min(price, Location.MAX_FARE);
+
+        if (current.getBalance() < finalPrice) {
+            JOptionPane.showMessageDialog(this, "You have insufficient funds for this booking.");
+            return;
+        }
+
+        try {
+            int bookingId = this.bookingsDB.addBooking(
+                current.getName(),
+                current.getEmail(),
+                LocalDate.now(),
+                departureDate,
+                destination,
+                finalPrice,
+                serviceType
+            );
+
+            if (bookingId > 0) {
+                double newBalance = current.getBalance() - finalPrice;
+                this.usersDB.updateUserBalance(current.getEmail(), newBalance);
+                current.setBalance(newBalance);
+                Session.setCurrentUser(current);
+                card_bal.setText(String.format("%.2f", newBalance));
+
+                showBookingConfirmation(current, LocalDate.now(), departureDate, destination, serviceType, finalPrice);
+                updateTable();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to create booking.");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserWindow.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "A database error occurred while creating your booking.");
+        }
+    }//GEN-LAST:event_pay_buttonActionPerformed
+
+    private void fare_booking_infoAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_fare_booking_infoAncestorAdded
+        // TODO add your handling code here:
+        fare_booking_info.setEditable(false);
+    }//GEN-LAST:event_fare_booking_infoAncestorAdded
+
+    private void fare_priceAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_fare_priceAncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fare_priceAncestorAdded
+
+    private void ferry_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ferry_typeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ferry_typeActionPerformed
+
+    private void name_placeholderAncestorRemoved(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_name_placeholderAncestorRemoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_name_placeholderAncestorRemoved
+
+    // sets user info on the ui
+    private void name_placeholderAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_name_placeholderAncestorAdded
+
+        User current = Session.getCurrentUser();
+
+        // TODO add your handling code here:
+        name_placeholder.setText(current.getName());
+        email_placeholder.setText(current.getEmail());
+
+        Date legacyDate = Date.valueOf(current.getMemberSince());
+
+        SimpleDateFormat formatted_date = new SimpleDateFormat("yyyy-MM-dd");
+        String s = formatted_date.format(legacyDate);
+        acc_made.setText(s);
+        discount_type.setText(current.getDiscountType());
+
+        if (current.getCardNumber() == null) {
+            card_number.setText("No card registered yet");
+        } else {
+            card_number.setText(current.getCardNumber());
+        }
+
+        card_balance.setText(Double.toString(current.getBalance()));
+
+        repaint();
+        revalidate();
+    }//GEN-LAST:event_name_placeholderAncestorAdded
+
     /**
      * @param args the command line arguments
      */
@@ -1079,32 +1206,38 @@ public class UserWindow extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
-        SwingUtilities.invokeLater(() -> {
-            new UserWindow().setVisible(true);
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new UserWindow().setVisible(true);
+            }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton LOGOUT;
+    private javax.swing.JButton LOGOUT1;
+    private javax.swing.JLabel Options;
     private javax.swing.JLabel acc_made;
     private javax.swing.JTextField amount_topup;
-    private javax.swing.JLabel balance;
+    private javax.swing.JComboBox<String> aucklandLocations;
     private javax.swing.JTable booking_table;
     private com.github.lgooddatepicker.components.CalendarPanel calender;
     private javax.swing.JLabel cardNM;
+    private javax.swing.JLabel card_bal;
     private javax.swing.JLabel card_balance;
     private javax.swing.JLabel card_number;
     private javax.swing.JButton delete_table;
     private javax.swing.JLabel discount_type;
     private javax.swing.JToggleButton edit_booking1;
+    private javax.swing.JButton emailChange;
     private javax.swing.JLabel email_placeholder;
     private javax.swing.JTextArea fare_booking_info;
     private javax.swing.JTextPane fare_price;
     private javax.swing.JComboBox<String> ferry_type;
     private javax.swing.JToggleButton generate_card;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1119,16 +1252,12 @@ public class UserWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -1139,10 +1268,12 @@ public class UserWindow extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JComboBox<String> location;
     private javax.swing.JLabel name_placeholder;
     private javax.swing.JLabel no_card_txt;
+    private javax.swing.JButton passwordChange;
     private javax.swing.JButton pay_button;
     private javax.swing.JLabel role_placeholder;
     private javax.swing.JButton topup_button;
